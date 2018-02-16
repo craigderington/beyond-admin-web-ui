@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+
+    <meta name="description" content="Dashboard" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="//s3.amazonaws.com/earl-admin-theme/html/assets/img/favicon.png" type="image/x-icon">
+
+    <!--begin: bootstrap -->
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/weather-icons.min.css" rel="stylesheet" type="text/css"/>
+
+    <!-- begin: fonts -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+
+    <!--Beyond styles-->
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/beyond.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/demo.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/typicons.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/animate.min.css" rel="stylesheet" type="text/css" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <!-- begin: loading container
+    <div class="loading-container">
+        <div class="loader"></div>
+    </div>
+    end: loading container -->
+
+
+    <!-- begin: navbar -->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-container">
+                <!-- begin: navbar brand -->
+                <div class="navbar-header pull-left">
+                    <a href="#" class="navbar-brand" style="margin:8px 0px 0px 5px;">
+                        <i class="fa fa-diamond"></i> <strong>EARL</strong> Admin
+                    </a>
+                </div>
+                <!-- end: navbar brand -->
+
+
+                <!-- begin: sidebar collapse
+                <div class="sidebar-collapse" id="sidebar-collapse">
+                    <i class="collapse-icon fa fa-bars"></i>
+                </div>
+                end: sidebar collapse -->
+
+                <!-- begin: user account --->
+                <div class="navbar-header navbar-nav navbar-right">
+                    <ul style="list-style: none;margin-top: 15px;">
+                        <li>
+                            <a style="margin-right:40px;color:white;text-decoration: none;" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user-circle-o"></i> Craig Derington
+                            </a>
+                            <ul class="pull-right dropdown-menu dropdown-arrow">
+                                <li><a href=""><i class="fa fa-user-circle-o"></i> Profile</a></li>
+                                <li><a href=""><i class="fa fa-sign-out"></i> Sign out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- end: user account area -->
+            </div>
+        </div>
+    </div>
+    <!-- end: navbar -->
+
+
+
+    <!-- begin: main container -->
+    <div class="main-container container-fluid">
+        <!-- begin: page container -->
+        <div class="page-container">
+
+            <!-- begin: page sidebar -->
+            <div class="page-sidebar" id="sidebar">
+
+                <!-- begin: sidebar menu -->
+                <ul class="nav sidebar-menu">
+
+                    <!-- begin: dashboard-->
+                    <li>
+                        <a href="{{ url_for('index') }}">
+                            <i class="menu-icon fa fa-dashboard"></i>
+                            <span class="menu-text"> Dashboard </span>
+                        </a>
+                    </li>
+
+                    <!-- begin: stores -->
+                    <li>
+                        <a href="">
+                            <i class="menu-icon fa fa-bank"></i>
+                            <span class="menu-text"> Stores </span>
+                        </a>
+                    </li>
+
+                    <!-- begin: campaigns -->
+                    <li>
+                        <a href="">
+                            <i class="menu-icon fa fa-th-list"></i>
+                            <span class="menu-text"> Campaigns </span>
+                        </a>
+                    </li>
+
+                    <!-- begin: reports -->
+                    <li>
+                        <a href="">
+                            <i class="menu-icon fa fa-bar-chart"></i>
+                            <span class="menu-text"> Reports </span>
+                        </a>
+                    </li>
+
+                    <!-- begin: admin menu -->
+                    <li>
+                        <a href="">
+                            <i class="menu-icon fa fa-gear"></i>
+                            <span class="menu-text"> Admin Menu </span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- end: sidebar menu -->
+            </div><!-- end: page sidebar -->
+
+
+
+            <!-- begin: page content -->
+            <div class="page-content">
+
+                <!-- begin: breadcrumbs -->
+                <div class="page-breadcrumbs">
+                    <ul class="breadcrumb">
+                        <li>
+                            <i class="fa fa-home"></i>
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="active">Dashboard</li>
+                    </ul>
+                </div>
+                <!-- end: breadcrumbs -->
+
+
+                <!-- begin: page header -->
+                <div class="page-header position-relative">
+                    <div class="header-title">
+                        <h1>
+                            {% block page_header %}{% endblock %}
+                        </h1>
+                    </div>
+                </div>
+                <!-- end: page header -->
+
+                <!-- begin: page body -->
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                <div class="row">
+                                    {% for category, message in messages %}
+                                      <div class="alert alert-{{ category }} alert-dismissible" style="margin-top:15px;">
+                                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                          <p><i class="fa fa-info-circle"></i> {{ message }}</p>
+                                     </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endwith %}
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                {% block content %}{% endblock %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end: page body -->
+            </div>
+            <!-- end: page content -->
+
+        </div>
+        <!-- end: page container -->
+        <!-- end: main container -->
+
+    </div>
+
+    <!-- begin: scripts -->
+    {% block js %}
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/jquery.min.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/bootstrap.min.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+        <!-- begin: beyond scripts -->
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/beyond.js"></script>
+
+        <!-- sparkline scripts
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/sparkline/jquery.sparkline.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/sparkline/sparkline-init.js"></script>
+
+        Easy Pie Charts Needed Scripts
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/easypiechart/jquery.easypiechart.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/easypiechart/easypiechart-init.js"></script>
+
+        Flot Charts Needed Scripts
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/flot/jquery.flot.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/flot/jquery.flot.resize.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/flot/jquery.flot.pie.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/flot/jquery.flot.tooltip.js"></script>
+        <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/charts/flot/jquery.flot.orderBars.js"></script>
+    -->
+    {% endblock %}
+</body>
+<!--  /Body -->
+</html>
+
