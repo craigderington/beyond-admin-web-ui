@@ -1,0 +1,113 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Add New Store{% endblock %}
+{% block page_header %}Add New Store{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('stores') }}">Stores</a></li>
+<li>Add Store</li>
+{% endblock %}
+
+
+{% block content %}
+
+    {% for error in form.errors %}
+        <div class="alert alert-danger">
+            <p>{{error}}</p>
+        </div>
+    {% endfor %}
+
+    <div class="widget">
+        <div class="widget-header bordered-bottom bordered-blue">
+            <span class="widget-caption"><i class="fa fa-bank"></i> New Store Form</span>
+        </div>
+        <div class="widget-body">
+            <div>
+                <form role="form" method="post" id="add-store-form">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <label for="client_id">Client ID:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="client_id"
+                               name="client_id"
+                               placeholder="Enter Client ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Store Name:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="name"
+                               name="name"
+                               placeholder="Enter Store Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="address1">Address 1:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="address1"
+                               name="address1"
+                               placeholder="Enter Store Address 1">
+                    </div>
+                     <div class="form-group">
+                        <label for="address2">Address 2:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="address2"
+                               name="address2"
+                               placeholder="Enter Store Address 2">
+                    </div>
+                     <div class="form-group">
+                        <label for="city">City:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="city"
+                               name="city"
+                               placeholder="Enter Store City">
+                    </div>
+                     <div class="form-group">
+                        <label for="state">State:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="state"
+                               name="state"
+                               placeholder="Enter Store State">
+                    </div>
+                     <div class="form-group">
+                        <label for="zip_code">Zip Code:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="zip_code"
+                               name="zip_code"
+                               placeholder="Enter Store Zip Code">
+                    </div>
+
+                     <div class="form-group">
+                        <label for="phone_number">Phone Number:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="phone_number"
+                               name="phone_number"
+                               placeholder="Enter Store Phone">
+                    </div>
+
+                     <div class="form-group">
+                        <label for="notification_email">Notification Email:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="notification_email"
+                               name="notification_email"
+                               placeholder="Enter Notification Email Address">
+                    </div>
+
+                    <!-- form actions -->
+
+                    <button type="submit" form="add-store-form" value="submit" class="btn btn-md btn-primary .shiny">
+                        <i class="fa fa-save"></i> Save Store
+                    </button>
+
+                    <a href="{{ url_for('stores') }}" class="btn btn-md btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

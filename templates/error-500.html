@@ -11,28 +11,29 @@ Purchase: https://wrapbootstrap.com/theme/beyondadmin-adminapp-angularjs-mvc-WB0
     <meta charset="utf-8" />
     <title>Error 500</title>
 
-    <meta name="description" content="Error 500" />
+    <meta name="description" content="Dashboard" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
-    <!--Basic Styles-->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- favicon -->
+    <link rel="shortcut icon" href="//s3.amazonaws.com/earl-admin-theme/html/assets/img/favicon.png" type="image/x-icon">
+
+    <!--begin: bootstrap -->
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
-    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/weather-icons.min.css" rel="stylesheet" type="text/css"/>
 
-    <!--Fonts-->
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+    <!-- begin: fonts -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
 
     <!--Beyond styles-->
-    <link id="beyond-link" href="assets/css/beyond.min.css" rel="stylesheet" />
-    <link href="assets/css/demo.min.css" rel="stylesheet" />
-    <link href="assets/css/animate.min.css" rel="stylesheet" />
-    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
-
-    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
-    <script src="assets/js/skins.min.js"></script>
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/beyond.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/demo.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/typicons.min.css" rel="stylesheet" type="text/css" />
+    <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/animate.min.css" rel="stylesheet" type="text/css" />
 </head>
 <!--Head Ends-->
 <!--Body-->
@@ -42,19 +43,19 @@ Purchase: https://wrapbootstrap.com/theme/beyondadmin-adminapp-angularjs-mvc-WB0
         <section class="error-container text-center">
             <h1>500</h1>
             <div class="error-divider">
-                <h2>ooops!!</h2>
+                <h2>Oh, No.  </h2>
                 <p class="description">SOMETHING WENT WRONG.</p>
             </div>
-            <a href="index.html" class="return-btn"><i class="fa fa-home"></i>Home</a>
+            <a href="{{ url_for('index') }}" class="return-btn"><i class="fa fa-home"></i>Home</a>
         </section>
     </div>
-    <!--Basic Scripts-->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+    <!--begin: scripts-->
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/jquery.min.js"></script>
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/bootstrap.min.js"></script>
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/slimscroll/jquery.slimscroll.min.js"></script>
 
-    <!--Beyond Scripts-->
-    <script src="assets/js/beyond.min.js"></script>
+    <!-- begin: beyond scripts -->
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/beyond.js"></script>
 
     
 </body>

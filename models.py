@@ -2,6 +2,7 @@ from database import Base
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Text
 from sqlalchemy.orm import relationship
+from werkzeug.security import generate_password_hash, check_password_hash
 # Define application Bases
 
 
@@ -10,7 +11,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(64))
     last_name = Column(String(64))
-    username = Column(String(64), unique=True, nullable=False)
+    username = Column(String(64), unique=True, nullable=False, index=True)
     password = Column(String(256), nullable=False)
     active = Column(Boolean, default=1)
     email = Column(String(120), unique=True, nullable=False)
@@ -22,6 +23,28 @@ class User(Base):
     created_by_fk = Column(Integer)
     changed_by_fk = Column(Integer)
     token = Column(String(1024))
+
+    def __init__(self, username, password):
+        self.username = username
+        self.set_password(password)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return int(self.id)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     def __repr__(self):
         if self.last_name and self.first_name:
@@ -167,6 +190,9 @@ class Store(Base):
             self.name
         )
 
+    def get_id(self):
+        return int(self.id)
+
 
 class CampaignType(Base):
     __tablename__ = 'campaigntypes'
@@ -187,14 +213,14 @@ class Campaign(Base):
     name = Column(String(255))
     job_number = Column(Integer, unique=True)
     created_date = Column(DateTime, onupdate=datetime.now)
-    created_by = Column(Integer, ForeignKey('user.id'))
+    created_by = Column(Integer, ForeignKey('ab_user.id'))
     type = Column(Integer, ForeignKey('campaigntypes.id'))
     campaign_type = relationship('CampaignType')
     options = Column(Text)
     description = Column(Text)
     funded = Column(Boolean, default=0)
     approved = Column(Boolean, default=0)
-    approved_by = Column(Integer, ForeignKey('user.id'))
+    approved_by = Column(Integer, ForeignKey('ab_user.id'))
     status = Column(String(255))
     objective = Column(Text)
     frequency = Column(String(255))

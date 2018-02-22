@@ -1,0 +1,83 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Manage Store Campaigns{% endblock %}
+{% block page_header %}Manage Store Campaigns{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('campaigns') }}">Campaigns</a></li>
+{% endblock %}
+
+
+{% block content %}
+
+    {% if campaigns %}
+
+        <div class="well with-header with-footer">
+            <div class="header bg-success">
+                <i class="fa fa-th-list"></i> <strong>Active Campaign List</strong>
+            </div>
+            <span class="pull-left">
+                <div class="form-group">
+                    <span class="input-icon inverted">
+                        <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Campaigns">
+                        <i class="fa fa-search bg-default"></i>
+                    </span>
+                </div>
+            </span>
+            <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
+                <a href="{{ url_for('campaign_add') }}" class="btn btn-sm btn-default .shiny">
+                    <i class="fa fa-plus-square"></i> Add Campaign
+                </a>
+            </span>
+
+            <table class="table table-hover table-striped">
+                <thead class="bordered-primary">
+                    <tr>
+                        <th>Campaign Name</th>
+                        <th>Campaign Type</th>
+                        <th>Job Number</th>
+                        <th>Client ID</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                        <tr>
+                            <td><a href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}">{{ campaign.name}}</a></td>
+                            <td>{{ campaign.campaign_type }}</td>
+                            <td>{{ campaign.job_number }}</td>
+                            <td>{{ campaign.client_id }}</td>
+                            <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                            <td>{{ campaign.start_date|formatdate}}</td>
+                            <td>{{ campaign.end_date|formatdate }}</td>
+                            <td>
+                                <a class="btn btn-default btn-sm shiny icon-only"
+                                   href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
+                                   title="Get Campaign">
+                                    <i class="fa fa-check-circle"></i>
+                                </a>
+                                <a class="btn btn-default btn-sm shiny icon-only"
+                                   href="{{ url_for('reports') }}"
+                                   title="Campaign Reports">
+                                    <i class="fa fa-bar-chart"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="footer">
+                <span class="badge badge-success badge-square">{{ campaign_count }}</span> active campaigns showing...
+            </div>
+        </div>
+
+
+    {% else %}
+
+        <h3>There are no active campaigns to display.  Click add campaign to get started...</h3>
+
+    {% endif %}
+
+
+{% endblock %}

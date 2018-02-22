@@ -1,0 +1,240 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Campaign Detail &raquo; {{ campaign.name }}{% endblock %}
+{% block page_header %}Campaign Detail &raquo; {{ campaign.name }}{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('campaigns') }}">Campaigns</a></li>
+<li>{{ campaign.name }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="profile-container">
+        <div class="profile-header row">
+            <div class="col-lg-2 col-md-4 col-sm-12 text-center">
+                <i class="fa fa-address-card fa-5x icon-only" style="margin-top: 35px;"></i>
+            </div>
+            <div class="col-lg-5 col-md-8 col-sm-12 profile-info">
+                <div class="header-fullname"><h1>{{ campaign.name }}</h1></div>
+                {% if campaign.status == 'ACTIVE' %}
+                    <a href="#" class="btn btn-success btn-md btn-follow">
+                        <i class="fa fa-check"></i> {{ campaign.status.upper() }}
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-danger btn-md btn-follow">
+                        <i class="fa fa-times-circle"></i> {{ campaign.status.upper() }}
+                    </a>
+                {% endif %}
+                <div class="header-description">
+
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 profile-stats">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value primary">23454</div>
+                        <div class="stats-title">VISITORS</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value darkorange">18903</div>
+                        <div class="stats-title">LEADS</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value azure">1507</div>
+                        <div class="stats-title">OPENS</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        <i class="fa fa-map-marker"></i> Radius: {{ campaign.radius }}
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        <i class="fa fa-map"></i> {{ store.city}}, {{ store.state.upper() }}
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        <i class="fa fa-info-circle"></i> {{ campaign.campaign_type }}
+                    </div>
+                </div>
+            </div>
+        </div><!-- end: profile-header -->
+
+    <div class="profile-body">
+        <div class="col-lg-12">
+            <div class="tabbable">
+                <ul class="nav nav-tabs tabs-flat nav-justified" id="myTab11">
+                    <li class="tab-azure active">
+                        <a data-toggle="tab" href="#settings">
+                            Campaign Settings
+                        </a>
+                    </li>
+                    <li class="tab-success">
+                        <a data-toggle="tab" href="#visitors">
+                            Visitors
+                        </a>
+                    </li>
+                    <li class="tab-darkorange">
+                        <a data-toggle="tab" href="#leads">
+                            Leads
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content tabs-flat">
+                    <div id="visitors" class="tab-pane">
+                        <table class="table table-hover table-striped">
+                            <thead class="bordered-primary">
+                                <tr>
+                                    <th>Visitor IP</th>
+                                    <th>Visitor Date</th>
+                                    <th>Job Number</th>
+                                    <th>Client ID</th>
+                                    <th>Processed</th>
+                                    <th>Country Code</th>
+                                    <th>Region</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for visitor in visitors %}
+                                <tr>
+                                    <td>{{ visitor.ip }}</td>
+                                    <td>{{ visitor.created_date|formatdate }}</td>
+                                    <td>{{ visitor.job_number }}</td>
+                                    <td>{{ visitor.client_id }}</td>
+                                    <td>{% if processed %}<span class="label label-success">True</span>{% else %}<span class="label label-danger">NOT PROCESSED</span>{% endif %}</td>
+                                    <td>{{ visitor.country_code }}</td>
+                                    <td>{{ visitor.region }}</td>
+                                    <td>{{ visitor.status }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="leads" class="tab-pane">
+                        <div class="row">
+
+                        </div>
+                    </div><!-- end: leads -->
+
+
+                    <div id="settings" class="tab-pane active">
+                        <div class="row">
+                            <form role="form" method="post" id="edit-campaign-form">
+                                <div class="col-lg-6">
+                                    {{ form.hidden_tag() }}
+                                    <div class="form-group">
+                                        <label for="job_number">Job Number:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="job_number"
+                                               name="job_number"
+                                               placeholder="Enter Job Number">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="radius">Radius:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="radius"
+                                               name="radius"
+                                               placeholder="Enter Campaign Radius">
+                                    </div>
+
+                                    <div class="form-group">
+                                         <label for="name">Start Date:</label>
+                                         <div class="input-group">
+                                             <span class="input-group-addon">
+                                                 <i class="fa fa-calendar"></i>
+                                             </span>
+                                             <input type="text"
+                                                class="form-control date-picker"
+                                                id="id-date-picker-1"
+                                                name="start_date"
+                                                placeholder="Select Start Date">
+                                         </div>
+                                    </div>
+
+                                     <div class="form-group">
+                                         <label for="name">End Date:</label>
+                                         <div class="input-group">
+                                             <span class="input-group-addon">
+                                                 <i class="fa fa-calendar"></i>
+                                             </span>
+                                             <input type="text"
+                                                class="form-control date-picker"
+                                                id="id-date-picker-2"
+                                                name="end_date"
+                                                placeholder="Select End Date">
+                                         </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="status">Campaign Status:  </label>
+                                        <div class="radio">
+                                            <label>
+                                                <input name="status" type="radio" checked="checked" value="INACTIVE">
+                                                <span class="text danger">NOT ACTIVE</span>
+                                            </label>
+                                            <label>
+                                                <input name="status" type="radio" value="ACTIVE">
+                                                <span class="text success">ACTIVE</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+
+
+                                    <div class="form-group">
+                                        <h6>Campaign Type</h6>
+                                        <select id="campaign_type" name="campaign_type" aria-hidden="true">
+                                            <option value="">Select Campaign Type</option>
+                                                <option value="">Campaign Type</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h6>Select Store</h6>
+                                        <select id="store_id" name="store_id" aria-hidden="true">
+                                            <option value="">Select Store</option>
+                                                <option value="">Store List</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="client_id">Client ID:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="client_id"
+                                               name="client_id"
+                                               placeholder="Enter Client ID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name">Campaign Name:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="name"
+                                               name="name"
+                                               placeholder="Enter Campaign Name">
+                                    </div>
+
+                                    <!-- form actions -->
+                                    <hr />
+                                    <button type="submit" form="edit-campaign-form" value="submit" class="btn btn-md btn-primary .shiny">
+                                        <i class="fa fa-save"></i> Save {{ campaign.name }}
+                                    </button>
+                                    <a href="{{ url_for('campaigns') }}" class="btn btn-md btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div><!-- end: tab-content -->
+            </div><!-- end: tabbable -->
+        </div><!-- end: profile body -->
+    </div><!-- end: profile container -->
+
+
+{% endblock %}

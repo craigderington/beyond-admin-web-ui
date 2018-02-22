@@ -1,0 +1,314 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: {{ store.name }} Store Detail{% endblock %}
+{% block page_header %}Store Detail: {{ store.name }}{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('stores') }}">Stores</a></li>
+<li>{{ store.name }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <div class="profile-container">
+        <div class="profile-header row">
+            <div class="col-lg-2 col-md-4 col-sm-12 text-center">
+                <i class="fa fa-address-card fa-5x icon-only" style="margin-top: 35px;"></i>
+            </div>
+            <div class="col-lg-5 col-md-8 col-sm-12 profile-info">
+                <div class="header-fullname"><h1>{{ store.name }}</h1></div>
+                <a href="#" class="btn btn-success btn-sm  btn-follow">
+                    <i class="fa fa-check"></i>
+                    ACTIVE
+                </a>
+                <div class="header-description">
+                    {{ store.address1 }} {{ store.address2 }} <br />
+                    {{ store.city }}, {{store.state.upper() }}  {{ store.zip_code }}
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 profile-stats">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value primary">4</div>
+                        <div class="stats-title">CAMPAIGNS</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value darkorange">1803</div>
+                        <div class="stats-title">VISITORS</div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
+                        <div class="stats-value azure">1207</div>
+                        <div class="stats-title">LEADS</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        <i class="fa fa-map-marker"></i> {{ store.city}}, {{ store.state.upper() }}
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        Phone: <strong>(407) 555-1212</strong>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
+                        Email: <strong>email@example.com</strong>
+                    </div>
+                </div>
+            </div>
+        </div><!-- end: profile-header -->
+
+    <div class="profile-body">
+        <div class="col-lg-12">
+            <div class="tabbable">
+                <ul class="nav nav-tabs tabs-flat nav-justified" id="myTab11">
+                    <li class="tab-azure active">
+                        <a data-toggle="tab" href="#settings">
+                            Settings
+                        </a>
+                    </li>
+                    <li class="tab-success">
+                        <a data-toggle="tab" href="#campaigns">
+                            Campaigns
+                        </a>
+                    </li>
+                    <li class="tab-darkorange">
+                        <a data-toggle="tab" id="contacttab" href="#contacts">
+                            Contacts
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content tabs-flat">
+                    <div id="campaigns" class="tab-pane">
+                        <table class="table table-hover table-striped">
+                            <thead class="bordered-primary">
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Campaign Type</th>
+                                    <th>Job Number</th>
+                                    <th>Client ID</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for campaign in campaigns %}
+                                    <tr>
+                                        <td>{{ campaign.name}}</td>
+                                        <td>{{ campaign.campaign_type }}</td>
+                                        <td>{{ campaign.job_number }}</td>
+                                        <td>{{ campaign.client_id }}</td>
+                                        <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                                        <td>{{ campaign.start_date|formatdate}}</td>
+                                        <td>{{ campaign.end_date|formatdate }}</td>
+                                        <td>
+                                            <a class="btn btn-default btn-sm shiny icon-only"
+                                               href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
+                                               title="Get Campaign">
+                                                <i class="fa fa-check-circle"></i>
+                                            </a>
+                                            <a class="btn btn-default btn-sm shiny icon-only"
+                                               href="{{ url_for('stores') }}"
+                                               title="Campaign Reports">
+                                                <i class="fa fa-bar-chart"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="contacts" class="tab-pane">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="profile-contacts">
+
+                                    <div class="profile-badge orange"><i class="fa fa-phone orange"></i><span>Contacts</span></div>
+                                    <div class="contact-info">
+                                        <p>
+                                            Phone	: 407-555-1212 <br>
+                                            Cell	: 407-555-1314
+                                        </p>
+                                        <p>
+                                            Email	: store@email.com
+
+                                        </p>
+                                        <p>
+
+                                            Web	: http://some-web-site.com
+                                        </p>
+                                    </div>
+                                    <div class="profile-badge azure">
+                                        <i class="fa fa-map-marker azure"></i><span>Location</span>
+                                    </div>
+                                    <div class="contact-info">
+                                        <p>
+                                            Address<br>
+                                            Department 98<br>
+                                            44-46 Morningside Road<br>
+                                            Toronto, Canada
+                                        </p>
+                                        <p>
+                                            Office<br>
+                                            44-46 Morningside Road<br>
+                                            Toronto, Canada
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- end: contacts -->
+
+
+                    <div id="settings" class="tab-pane active">
+                        <div class="row">
+                            <form role="form" method="post" id="edit-store-form">
+                                <div class="col-lg-6">
+                                    {{ form.hidden_tag() }}
+                                    <div class="form-group">
+                                        <label for="client_id">Client ID:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="client_id"
+                                               name="client_id"
+                                               value="{{ store.client_id }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name">Store Name:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="name"
+                                               name="name"
+                                               value="{{ store.name }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address1">Address 1:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="address1"
+                                               name="address1"
+                                               value="{{ store.address1 }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address2">Address 2:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="address2"
+                                               name="address2"
+                                               value="{{ store.address2 }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="city"
+                                               name="city"
+                                               value="{{ store.city }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="state"
+                                               name="state"
+                                               value="{{ store.state }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="zip_code">Zip Code:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="zip_code"
+                                               name="zip_code"
+                                               value="{{ store.zip_code }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone_number">Phone Number:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="phone_number"
+                                               name="phone_number"
+                                               value="{{ store.phone_number }}">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="notification_email">Notification Email:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="notification_email"
+                                               name="notification_email"
+                                               value="{{ store.notification_email }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="adf_email">ADF Email:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="adf_email"
+                                               name="adf_email"
+                                               value="{{ store.adf_email }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="reporting_email">Reporting Email:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="reporting_email"
+                                               name="reporting_email"
+                                               value="{{ store.reporting_email }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="simplifi_name">SimpliFi Name:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="simplifi_name"
+                                               name="simplifi_name"
+                                               value="{{ store.simplifi_name }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="simplifi_client_id">SimpliFi Client ID:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="simplifi_client_id"
+                                               name="simplifi_client_id"
+                                               value="{{ store.simplifi_client_id }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="simplifi_company_id">SimpliFi Company ID:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="simplifi_company_id"
+                                               name="simplifi_company_id"
+                                               value="{{ store.simplifi_company_id }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="radio">
+                                            <label for="status">Store Status:  </label>
+                                                <input name="status" type="radio" checked="checked" value="ACTIVE">
+                                                <span class="text">Active </span>
+                                            </label>
+                                            <label>
+                                                <input name="status" type="radio" value="INACTIVE">
+                                                <span class="text">Inactive </span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- form actions -->
+                                    <hr />
+                                    <button type="submit" form="edit-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
+                                        <i class="fa fa-save"></i> Save {{ store.name }}
+                                    </button>
+                                    <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div><!-- end: tab-content -->
+            </div><!-- end: tabbale -->
+        </div><!-- end: profile body -->
+    </div><!-- end: profile container -->
+{% endblock %}

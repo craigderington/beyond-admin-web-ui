@@ -1,0 +1,119 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Manage Stores{% endblock %}
+{% block page_header %}Store Detail: {{ store.name }}{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('stores') }}">Stores</a></li>
+<li>{{ store.name }}</li>
+{% endblock %}
+
+{% block content %}
+
+    <div class="well well-lg">
+        <h3 class="block">{{ store.name }}
+
+            <span class="pull-right">
+                <a href="{{ url_for('stores') }}" class="btn btn-sm btn-default .shiny">
+                    <i class="fa fa-arrow-circle-left"></i> Store List
+                </a>
+                <a href="{{ url_for('stores') }}" class="btn btn-sm btn-default .shiny">
+                    <i class="fa fa-pencil-square"></i> Edit Store
+                </a>
+                <a href="{{ url_for('store_add') }}" class="btn btn-sm btn-darkorange .shiny">
+                    <i class="fa fa-plus-circle"></i> Add Store
+                </a>
+            </span>
+        </h3>
+
+        <div class="widget flat radius-bordered">
+            <div class="widget-body">
+                <div class="widget-main ">
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs tabs-flat" id="myTab11">
+                            <li class="active">
+                                <a data-toggle="tab" href="#details" aria-expanded="true">
+                                    <i class="fa fa-check-square-o"></i> {{ store.name }} Details
+                                </a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#simplifi" aria-expanded="false">
+                                    <i class="fa fa-gear"></i> SimpliFi Settings
+                                </a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#contacts" aria-expanded="false">
+                                    <i class="fa fa-address-book-o"></i> Store Contacts
+                                </a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#settings" aria-expanded="false">
+                                    <i class="fa fa-th-list"></i> Campaign Settings
+                                </a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#campaigns" aria-expanded="false">
+                                    <i class="fa fa-globe"></i> Active Campaigns
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content tabs-flat">
+                            <div id="details" class="tab-pane active">
+                                <p>store-details-text</p>
+                            </div>
+                            <div id="simplifi" class="tab-pane">
+                                <p>simplefi settings</p>
+                            </div>
+                            <div id="contacts" class="tab-pane">
+                                <p>store contacts.  coming soon.</p>
+                            </div>
+                            <div id="settings" class="tab-pane">
+                                <p>campaign settings, radius, etc...</p>
+                            </div>
+                            <div id="campaigns" class="tab-pane">
+
+                                <table class="table table-hover table-striped">
+                                    <thead class="bordered-primary">
+                                        <tr>
+                                            <th>Campaign Name</th>
+                                            <th>Campaign Type</th>
+                                            <th>Job Number</th>
+                                            <th>Client ID</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for campaign in campaigns %}
+                                            <tr>
+                                                <td>{{ campaign.name}}</td>
+                                                <td>{{ campaign.campaign_type }}</td>
+                                                <td>{{ campaign.job_number }}</td>
+                                                <td>{{ campaign.client_id }}</td>
+                                                <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                                                <td>{{ campaign.start_date|formatdate}}</td>
+                                                <td>{{ campaign.end_date|formatdate }}</td>
+                                                <td>
+                                                    <a class="btn btn-default btn-sm shiny icon-only"
+                                                       href="{{ url_for('stores') }}"
+                                                       title="Get Campaign">
+                                                        <i class="fa fa-check-circle"></i>
+                                                    </a>
+                                                    <a class="btn btn-default btn-sm shiny icon-only"
+                                                       href="{{ url_for('stores') }}"
+                                                       title="Campaign Reports">
+                                                        <i class="fa fa-bar-chart"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

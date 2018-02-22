@@ -1,0 +1,88 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Manage Stores{% endblock %}
+{% block page_header %}Manage Stores{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('stores') }}">Stores</a></li>
+{% endblock %}
+
+{% block content %}
+
+    {% if stores %}
+
+        <div class="well with-header with-footer">
+            <div class="header bg-success">
+                <i class="fa fa-bank"></i> <strong>Active Store List</strong>
+            </div>
+            <span class="pull-left">
+                <div class="form-group">
+                    <span class="input-icon inverted">
+                        <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Stores">
+                        <i class="fa fa-search bg-default"></i>
+                    </span>
+                </div>
+            </span>
+            <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
+                <a href="#" class="btn btn-sm btn-default .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
+                <a href="{{ url_for('store_add') }}" class="btn btn-sm btn-azure .shiny">
+                    <i class="fa fa-plus-circle"></i> Add Store
+                </a>
+            </span>
+            <table class="table table-hover">
+                <thead class="bordered-primary">
+                    <tr>
+                        <th>Store Name</th>
+                        <th>ClientID</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for store in stores %}
+                        <tr>
+                            <td><a href="{{ url_for('store_detail', store_pk_id=store.id)}}">{{ store.name}}</a></td>
+                            <td>{{ store.client_id }}</td>
+                            <td>{{ store.city }}</td>
+                            <td>{{ store.state }}</td>
+                            <td><span class="label label-success">{{ store.status}}</span></td>
+                            <td>
+                                <!-- actions -->
+                                <a class="btn btn-default btn-sm shiny icon-only primary"
+                                   href="{{ url_for('store_detail', store_pk_id=store.id)}}"
+                                   title="Edit Store">
+                                    <i class="fa fa-check-circle-o"></i>
+                                </a>
+                                <a class="btn btn-default btn-sm shiny icon-only danger"
+                                   href="#"
+                                   title="Archive Store">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="footer">
+                <span class="badge badge-success badge-square">{{ store_count }}</span> active stores showing...
+            </div>
+        </div>
+
+
+    {% else %}
+
+        <h3>There are no stores to display.  Click add store to get started...</h3>
+
+    {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
