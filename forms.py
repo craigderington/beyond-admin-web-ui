@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, PasswordField, DateField, SelectField
+from wtforms import IntegerField, StringField, PasswordField, DateField, SelectField, RadioField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Length
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from models import CampaignType, Store
@@ -31,10 +31,23 @@ class AddCampaignForm(FlaskForm):
     start_date = DateField('Start Date:', format='%m/%d/%Y', validators=[DataRequired()])
     end_date = DateField('End Date:', format='%m/%d/%Y', validators=[DataRequired()])
     radius = IntegerField('Campaign Radius:', validators=[DataRequired()])
-    objective = StringField('Campaign Objective:')
-    description = StringField('Campaign Description:')
     store_id = IntegerField('Store ID:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
+
+
+class ApproveCampaignForm(FlaskForm):
+    options = StringField('Options:',)
+    description = StringField('Description:')
+    funded = RadioField('Funded:', coerce=int, choices=[(1, 'Funded'), (0, 'Not Funded')])
+    approved = RadioField('Approved:', coerce=int, choices=[(1, 'Approved'), (0, 'Not Approved')])
+    objective = StringField('Objective:')
+    frequency = SelectField('Frequency:', choices=[('Weekly', 'Weekly'), ('Bi-weekly', 'Bi-Weekly'),
+                                                   ('Monthly', 'Monthly')])
+
+
+class CampaignCreativeForm(FlaskForm):
+    creative_header = StringField('Creative Header:', validators=[DataRequired()])
+    creative_footer = StringField('Creative Footer:', validators=[DataRequired()])
 
 
 class AddStoreForm(FlaskForm):
@@ -53,5 +66,5 @@ class AddStoreForm(FlaskForm):
     simplifi_client_id = StringField('SimpliFi ClientID:')
     simplifi_name = StringField('SimpliFi Name:')
     adf_email = StringField('ADF Email:')
-    reporting_email = StringField('Reporting Email:')
-    status = StringField('Status:')
+    reporting_email = StringField('Reporting Email:', validators=[DataRequired()])
+    status = StringField('Status:', validators=[DataRequired()])

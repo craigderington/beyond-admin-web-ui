@@ -9,8 +9,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(Base):
     __tablename__ = 'ab_user'
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(64))
-    last_name = Column(String(64))
+    first_name = Column(String(64), nullable=False)
+    last_name = Column(String(64), nullable=False)
     username = Column(String(64), unique=True, nullable=False, index=True)
     password = Column(String(256), nullable=False)
     active = Column(Boolean, default=1)
@@ -168,19 +168,19 @@ class Lead(Base):
 class Store(Base):
     __tablename__ = 'stores'
     id = Column(Integer, primary_key=True)
-    client_id = Column(String(255), unique=True)
-    name = Column(String(255), unique=True)
-    address1 = Column(String(255))
+    client_id = Column(String(255), unique=True, nullable=False)
+    name = Column(String(255), unique=True, nullable=False)
+    address1 = Column(String(255), nullable=False)
     address2 = Column(String(255))
-    city = Column(String(255))
-    state = Column(String(2))
-    zip_code = Column(Integer)
+    city = Column(String(255), nullable=False)
+    state = Column(String(2), nullable=False)
+    zip_code = Column(String(10), nullable=False)
     zip_4 = Column(Integer)
-    status = Column(String(20), default='Active')
+    status = Column(String(20), default='Active', nullable=False)
     adf_email = Column(String(255))
-    notification_email = Column(String(255))
-    reporting_email = Column(String(255))
-    phone_number = Column(String(20))
+    notification_email = Column(String(255), nullable=False)
+    reporting_email = Column(String(255), nullable=False)
+    phone_number = Column(String(20), nullable=False)
     simplifi_company_id = Column(Integer)
     simplifi_client_id = Column(String(255))
     simplifi_name = Column(String(255))
@@ -197,7 +197,7 @@ class Store(Base):
 class CampaignType(Base):
     __tablename__ = 'campaigntypes'
     id = Column(Integer, primary_key=True)
-    name = Column(String(255))
+    name = Column(String(255), nullable=False)
 
     def __repr__(self):
         return '{}'.format(
@@ -208,28 +208,30 @@ class CampaignType(Base):
 class Campaign(Base):
     __tablename__ = 'campaigns'
     id = Column(Integer, primary_key=True)
-    store_id = Column(Integer, ForeignKey('stores.id'))
+    store_id = Column(Integer, ForeignKey('stores.id'), nullable=False)
     store = relationship('Store')
-    name = Column(String(255))
-    job_number = Column(Integer, unique=True)
+    name = Column(String(255), nullable=False)
+    job_number = Column(Integer, unique=True, nullable=False)
     created_date = Column(DateTime, onupdate=datetime.now)
     created_by = Column(Integer, ForeignKey('ab_user.id'))
-    type = Column(Integer, ForeignKey('campaigntypes.id'))
+    type = Column(Integer, ForeignKey('campaigntypes.id'), nullable=False)
     campaign_type = relationship('CampaignType')
-    options = Column(Text)
-    description = Column(Text)
+    options = Column(Text(length=1024))
+    description = Column(Text(length=1024))
     funded = Column(Boolean, default=0)
     approved = Column(Boolean, default=0)
     approved_by = Column(Integer, ForeignKey('ab_user.id'))
-    status = Column(String(255))
-    objective = Column(Text)
+    status = Column(String(255), nullable=False)
+    objective = Column(Text(length=1024))
     frequency = Column(String(255))
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
-    radius = Column(Integer, default=50)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    radius = Column(Integer, default=50, nullable=False)
     pixeltrackers_id = Column(Integer, ForeignKey('pixeltrackers.id'))
     pixeltracker = relationship('PixelTracker')
-    client_id = Column(String(20))
+    client_id = Column(String(20), nullable=False)
+    creative_header = Column(Text)
+    creative_footer = Column(Text)
 
     def __repr__(self):
         return '{}'.format(
@@ -240,10 +242,10 @@ class Campaign(Base):
 class PixelTracker(Base):
     __tablename__ = 'pixeltrackers'
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), unique=True)
-    ip_addr = Column(String(15), unique=True)
-    fqdn = Column(String(255), unique=True)
-    capacity = Column(Integer, default=200)
+    name = Column(String(255), unique=True, nullable=False)
+    ip_addr = Column(String(15), unique=True, nullable=False)
+    fqdn = Column(String(255), unique=True, nullable=False)
+    capacity = Column(Integer, default=200, nullable=False)
     total_campaigns = Column(Integer)
     active = Column(Boolean, default=1)
 

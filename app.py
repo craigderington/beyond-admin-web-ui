@@ -1,10 +1,10 @@
 from flask import Flask, make_response, redirect, request, Response, render_template, url_for, flash, g
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc
 from database import db_session
-from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead
-from forms import AddCampaignForm, UserLoginForm, AddStoreForm
+from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker
+from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm
 import argparse
 import config
 import datetime
@@ -115,7 +115,7 @@ def store_detail(store_pk_id):
         Campaign.created_date.desc()
     ).filter(
         Campaign.store_id == store_pk_id
-    ).all()
+    ).limit(100).all()
 
     form = AddStoreForm(request.form)
 
@@ -172,9 +172,10 @@ def store_add():
             city=form.city.data,
             state=form.state.data.upper(),
             zip_code=form.zip_code.data,
-            status='ACTIVE',
+            status=form.status.data,
             phone_number=form.phone_number.data,
-            notification_email=form.notification_email.data
+            notification_email=form.notification_email.data,
+            reporting_email=form.reporting_email.data
         )
 
         db_session.add(new_store)
@@ -201,7 +202,7 @@ def campaigns():
     campaigns = Campaign.query.order_by(
         Campaign.created_date.desc()).filter(
         Campaign.status == 'Active'
-    ).all()
+    ).limit(100).all()
 
     if campaigns:
         campaign_count = len(campaigns)
@@ -214,7 +215,7 @@ def campaigns():
     )
 
 
-@app.route('/campaign/<int:campaign_pk_id>', methods=['GET'])
+@app.route('/campaign/<int:campaign_pk_id>', methods=['GET', 'POST'])
 @login_required
 def campaign_detail(campaign_pk_id):
     """
@@ -222,13 +223,55 @@ def campaign_detail(campaign_pk_id):
     :param campaign_pk_id:
     :return: campaign
     """
+    visitors_per_page = 20
+    page = request.args.get('page', 1, type=int)
     form = AddCampaignForm()
-    visitors = []
-    leads = []
+    approval_form = ApproveCampaignForm()
+    creative_form = CampaignCreativeForm()
 
+    # first, get our campaign
     campaign = Campaign.query.filter(
         Campaign.id == campaign_pk_id
     ).one()
+
+    if request.method == 'POST':
+
+        if 'save-campaign-settings' in request.form.keys() and form.validate_on_submit():
+
+            # update the campaign data
+            campaign.job_number = form.job_number.data
+            campaign.client_id = form.client_id.data
+            campaign.radius = form.radius.data
+            campaign.start_date = form.start_date.data
+            campaign.end_data = form.end_date
+            campaign.name = form.name.data
+            campaign.status = form.status.data
+
+            db_session.commit()
+
+            flash('Campaign {} Settings were updated successfully'.format(campaign.name), category='success')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+
+        elif 'save-campaign-approval' in request.form.keys() and approval_form.validate_on_submit():
+            campaign.options = approval_form.options.data
+            campaign.description = approval_form.description.data
+            campaign.funded = approval_form.funded.data
+            campaign.approved = approval_form.approved.data
+            campaign.objective = approval_form.objective.data
+            campaign.frequency = approval_form.frequency.data
+
+            db_session.commit()
+
+            flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='info')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+
+        elif 'save-campaign-creative' in request.post.keys() and creative_form.validate_on_submit():
+            campaign.creative_header = creative_form.creative_header.data
+            campaign.creative_footer = creative_form.creative_footer.data
+            db_session.commit()
+
+            # flash a success message
+            flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='info')
 
     if campaign:
 
@@ -241,19 +284,32 @@ def campaign_detail(campaign_pk_id):
             Store.id == campaign.store_id
         ).one()
 
+        if campaign.pixeltrackers_id:
+            pt = PixelTracker.query.get(campaign.pixeltrackers_id)
+
         stmt = text("SELECT v.id, av.* from visitors v, appendedvisitors av where v.id = av.visitor "
                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
 
         leads = AppendedVisitor.query.from_statement(stmt).all()
+        campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
+        visitor_count = len(visitors)
+        lead_count = len(leads)
+        open_count = 0
 
     return render_template(
         'campaign_detail.html',
         campaign=campaign,
-        visitors=visitors,
+        visitors=visitors[0:100],
         leads=leads,
         today=today,
         form=form,
-        store=store
+        approval_form=approval_form,
+        store=store,
+        campaign_pixelhash=campaign_pixelhash.strip()[-10:],
+        pt=pt,
+        visitor_count=visitor_count,
+        lead_count=lead_count,
+        open_count=open_count
     )
 
 
@@ -303,6 +359,48 @@ def campaign_add():
         stores=stores,
         campaign_types=campaign_types
     )
+
+
+@app.route('/create/pixel/<int:campaign_pk_id>', methods=['GET'])
+def create_pixel(campaign_pk_id):
+    """
+    Create Tracking Pixel
+    :param campaign_pk_id:
+    :return: URL
+    """
+
+    # get our list of active trackers
+    tracker = PixelTracker.query.filter(
+        PixelTracker.active == 1
+    ).one()
+
+    # get the campaign instance
+    campaign = Campaign.query.get(campaign_pk_id)
+
+    if campaign:
+        if tracker:
+
+            # assign the tracker to this campaign
+            campaign.pixeltrackers_id == tracker.id
+            campaign.status = 'ACTIVE'
+            db_session.commit()
+
+            # flash a success message
+            flash('The Campaign Pixel Tracker was assigned to {}.'.format(tracker.name), category='success')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+
+        else:
+            # can not assign a tracker.  set the campaign status to inactive
+            campaign.status = 'INACTIVE'
+            db_session.commit()
+            flash('Sorry, there are no available Pixel Trackers to assign to this campaign.', category='danger')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+
+    else:
+
+        # flash campaign not found
+        flash('Sorry, campaign {} was not found.'.format(campaign_pk_id), category='warning')
+        return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
 
 
 @app.route('/admin', methods=['GET'])
@@ -382,6 +480,12 @@ def flash_errors(form):
 def format_date(value):
     dt = value
     return dt.strftime('%Y-%m-%d %H:%M')
+
+
+@app.template_filter('datemdy')
+def format_date(value):
+    dt = value
+    return dt.strftime('%m/%d/%Y')
 
 
 if __name__ == '__main__':

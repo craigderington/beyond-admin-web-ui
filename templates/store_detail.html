@@ -96,7 +96,11 @@
                                         <td>{{ campaign.campaign_type }}</td>
                                         <td>{{ campaign.job_number }}</td>
                                         <td>{{ campaign.client_id }}</td>
-                                        <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                                        <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span>
+                                            {% if campaign.status == 'INACTIVE' %}<a href="" class="btn btn-xs btn-azure .shiny icon-only" title="'Activate Campaign">
+                                                <i class="fa fa-cog"></i></a>
+                                            {% endif %}
+                                        </td>
                                         <td>{{ campaign.start_date|formatdate}}</td>
                                         <td>{{ campaign.end_date|formatdate }}</td>
                                         <td>
@@ -161,6 +165,13 @@
 
                     <div id="settings" class="tab-pane active">
                         <div class="row">
+
+                            {% for error in form.errors %}
+                                <div class="alert alert-danger">
+                                    <p>{{error}}</p>
+                                </div>
+                            {% endfor %}
+
                             <form role="form" method="post" id="edit-store-form">
                                 <div class="col-lg-6">
                                     {{ form.hidden_tag() }}
@@ -281,18 +292,19 @@
                                                class="form-control"
                                                id="simplifi_company_id"
                                                name="simplifi_company_id"
-                                               value="{{ store.simplifi_company_id }}">
+                                               value="{{ store.simplifi_company_id }}"
+                                               placeholder="Enter the SimpliFi Company ID.  Integer Required.">
                                     </div>
 
                                     <div class="form-group">
                                         <div class="radio">
                                             <label for="status">Store Status:  </label>
                                                 <input name="status" type="radio" checked="checked" value="ACTIVE">
-                                                <span class="text">Active </span>
+                                                <span class="text success">Active </span>
                                             </label>
                                             <label>
                                                 <input name="status" type="radio" value="INACTIVE">
-                                                <span class="text">Inactive </span>
+                                                <span class="text danger">Inactive </span>
                                             </label>
                                         </div>
                                     </div>
@@ -302,7 +314,9 @@
                                     <button type="submit" form="edit-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
                                         <i class="fa fa-save"></i> Save {{ store.name }}
                                     </button>
-                                    <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                                    <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny">
+                                        <i class="fa fa-times-circle"></i> Cancel
+                                    </a>
                                 </div>
                             </form>
                         </div>

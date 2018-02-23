@@ -98,13 +98,35 @@
                                placeholder="Enter Notification Email Address">
                     </div>
 
+                    <div class="form-group">
+                        <label for="reporting_email">Reporting Email:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="reporting_email"
+                               name="reporting_email"
+                               placeholder="Enter Reporting Email Address">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="radio">
+                            <label for="status">Store Status:  </label>
+                                <input name="status" type="radio" checked="checked" value="ACTIVE">
+                                <span class="text success">Active </span>
+                            </label>
+                            <label>
+                                <input name="status" type="radio" value="INACTIVE">
+                                <span class="text danger">Inactive </span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- form actions -->
 
-                    <button type="submit" form="add-store-form" value="submit" class="btn btn-md btn-primary .shiny">
+                    <button type="submit" form="add-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
                         <i class="fa fa-save"></i> Save Store
                     </button>
 
-                    <a href="{{ url_for('stores') }}" class="btn btn-md btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                    <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
                 </form>
             </div>
         </div>
