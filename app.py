@@ -36,7 +36,7 @@ mongo_db = mongo_client[app.config['MONGO_DB']]
 # define our login_manager
 login_manager = LoginManager(app)
 login_manager.init_app(app)
-login_manager.login_view = "login"
+login_manager.login_view = "/login"
 
 # set the current date time for each page
 today = datetime.datetime.now().strftime('%c')
@@ -443,23 +443,30 @@ def reports():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 
-    if request.method == 'GET':
-        return render_template('login.html')
+    form = UserLoginForm()
 
-    username = request.form['username']
-    password = request.form['password']
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
 
-    user = db_session.query(User).filter_by(username=username).first()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
 
-    if user:
+        user = db_session.query(User).filter_by(username=username).first()
 
-        if user.check_password(password):
-            login_user(user)
-            flash('You have been logged in successfully...', 'success')
-            return redirect(request.args.get('next') or url_for('index'))
+        if user is None or not user.check_password(password):
+            flash('Username or password is invalid!  Please try again...')
+            return redirect(url_for('login'))
 
-    flash('Username or password is invalid!  Please try again...')
-    return redirect(url_for('login'))
+        # login the user and redirect
+        login_user(user)
+        flash('You have been logged in successfully...', 'success')
+        return redirect(request.args.get('next') or url_for('index'))
+
+    return render_template(
+        'login.html',
+        form=form
+    )
 
 
 @app.route('/profile', methods=['GET', 'POST'])

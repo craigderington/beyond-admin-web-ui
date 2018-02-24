@@ -47,8 +47,17 @@
             {% endwith %}
 
             <div class="loginbox bg-white">
+
+                <!-- show login errors -->
+                {% for error in form.errors %}
+                    <div class="alert alert-danger">
+                        <p>{{error}}</p>
+                    </div>
+                {% endfor %}
+
                 <div class="loginbox-title"><i class="fa fa-diamond"></i> <strong>EARL Admin</strong></div>
                     <form method="post" name="login-form">
+                        {{ form.hidden_tag() }}
                         <div class="loginbox-textbox">
                             <input type="text" name="username" id="username" class="form-control" placeholder="enter username" />
                         </div>

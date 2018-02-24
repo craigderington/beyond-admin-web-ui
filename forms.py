@@ -19,8 +19,8 @@ def get_active_stores():
 
 
 class UserLoginForm(FlaskForm):
-    username = StringField('Username', [InputRequired(message='Username is required.'), Length(min=8, max=64)])
-    password = PasswordField('Password', [InputRequired(message='Password is required.'), Length(min=8, max=256)])
+    username = StringField('Username', [DataRequired()])
+    password = PasswordField('Password', [DataRequired()])
 
 
 class AddCampaignForm(FlaskForm):
