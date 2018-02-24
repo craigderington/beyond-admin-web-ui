@@ -4,3 +4,99 @@
 {% block breadcrumbs %}
 <li><a href="{{ url_for('reports') }}">Reports</a></li>
 {% endblock %}
+
+
+{% block content %}
+    <div class="well with-header">
+        <div class="header bordered-azure"><i class="fa fa-bar-chart"></i> <strong>Campaign Reports</strong></div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="date-range"><strong>Select Campaign Dates</strong></label>
+                        <div class="controls">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </span><input type="text" class="form-control" name="report-date-range" id="date-range">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <h6><strong>Campaigns</strong></h6>
+                            <select id="campaign" name="campaign" aria-hidden="true">
+                                <option value="">Select Campaign</option>
+                                {% for campaign in campaigns %}
+                                    <option value="{{ campaign.id }}">{{ campaign.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h6><strong>Stores</strong></h6>
+                        <select id="store" name="store" aria-hidden="true">
+                            <option value="">Select Store</option>
+                            {% for store in stores %}
+                                <option value="{{ store.id }}">{{ store.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <h6><strong>Report Type</strong></h6>
+                        <select id="report-type" name="report-type" aria-hidden="true">
+                            <option value="">Select Report Type</option>
+                            <option value="daily-recap">Daily Recap</option>
+                            <option value="campaign-stats">Campaign Stats</option>
+                            <option value="store-stats">Store Stats (All Campaigns)</option>
+                            <option value="month-v-month">Month Over Month</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+
+    <div class="well with-header">
+        <div class="header bordered-azure">
+            <i class="fa fa-bar-chart"></i> <strong>Report Results</strong></div>
+            <div class="row">
+                <div class="alert alert-warning fade in">
+                    <button class="close" data-dismiss="alert">&times;</button>
+                    <i class="fa-fw fa fa-warning"></i>
+                    <strong></strong> No report selected...  Please select a report type and filter.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+    {{ super() }}
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/datetime/bootstrap-datepicker.js"></script>
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/datetime/moment.js"></script>
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/datetime/daterangepicker.js"></script>
+
+    <script>
+        //-- bootstrap date range picker--
+        $('#date-range').daterangepicker({
+            clearBtn: true,
+            todayBtn: true,
+            autoClose: true
+        }).on('changeDate', function (ev) {
+            $(this).daterangepicker('hide');
+        });
+    </script>
+    <!-- datepicker-js ->
+    <script src="assets/js/datetime/bootstrap-timepicker.js"></script>
+{% endblock %}

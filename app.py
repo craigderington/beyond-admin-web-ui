@@ -4,7 +4,8 @@ from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc
 from database import db_session
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker
-from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm
+from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
+    ReportFilterForm
 import argparse
 import config
 import datetime
@@ -420,11 +421,19 @@ def leads():
 
 
 @app.route('/reports', methods=['GET'])
-@login_required
+#@login_required
 def reports():
+
+    form = ReportFilterForm()
+    stores = Store.query.order_by('name').filter_by(status='ACTIVE').all()
+    campaigns = Campaign.query.order_by(Campaign.name.asc()).filter_by(status='ACTIVE').all()
+
     return render_template(
         'reports.html',
-        today=today
+        today=today,
+        form=form,
+        campaigns=campaigns,
+        stores=stores
     )
 
 

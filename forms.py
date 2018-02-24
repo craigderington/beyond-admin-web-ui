@@ -68,3 +68,9 @@ class AddStoreForm(FlaskForm):
     adf_email = StringField('ADF Email:')
     reporting_email = StringField('Reporting Email:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
+
+
+class ReportFilterForm(FlaskForm):
+    report_date_range = DateField('Start Date:', validators=[DataRequired()])
+    store_id = IntegerField('Store:', validators=[DataRequired()])
+    campaign_id = IntegerField('Campaign:', validators=[DataRequired()])
