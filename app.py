@@ -257,6 +257,8 @@ def campaign_detail(campaign_pk_id):
             campaign.description = approval_form.description.data
             campaign.funded = approval_form.funded.data
             campaign.approved = approval_form.approved.data
+            if campaign.approved:
+                campaign.approved_by = current_user.get_id()
             campaign.objective = approval_form.objective.data
             campaign.frequency = approval_form.frequency.data
 
@@ -265,7 +267,7 @@ def campaign_detail(campaign_pk_id):
             flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='info')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
 
-        elif 'save-campaign-creative' in request.post.keys() and creative_form.validate_on_submit():
+        elif 'save-campaign-creative' in request.form.keys() and creative_form.validate_on_submit():
             campaign.creative_header = creative_form.creative_header.data
             campaign.creative_footer = creative_form.creative_footer.data
             db_session.commit()
@@ -304,6 +306,7 @@ def campaign_detail(campaign_pk_id):
         today=today,
         form=form,
         approval_form=approval_form,
+        creative_form=creative_form,
         store=store,
         campaign_pixelhash=campaign_pixelhash.strip()[-10:],
         pt=pt,
@@ -420,7 +423,8 @@ def leads():
 @login_required
 def reports():
     return render_template(
-        'reports.html'
+        'reports.html',
+        today=today
     )
 
 

@@ -11,6 +11,7 @@
 
 
     <div class="profile-container">
+        <!-- begin: profile header -->
         <div class="profile-header row">
             <div class="col-lg-2 col-md-4 col-sm-12 text-center">
                 <i class="fa fa-address-card fa-5x icon-only" style="margin-top: 35px;"></i>
@@ -65,6 +66,7 @@
     <div class="profile-body">
         <div class="col-lg-12">
             <div class="tabbable">
+                <!-- begin: tabs -->
                 <ul class="nav nav-tabs tabs-flat nav-justified" id="myTab11">
                     <li class="tab-primary active">
                         <a data-toggle="tab" href="#settings">
@@ -96,8 +98,9 @@
                             Leads
                         </a>
                     </li>
-                </ul>
+                </ul><!-- end: tabs -->
 
+                <!-- begin: tab-content -->
                 <div class="tab-content tabs-flat">
                     {% for error in form.errors %}
                         <div class="alert alert-danger">
@@ -109,6 +112,14 @@
                             <p>{{ error }}</p>
                         </div>
                     {% endfor %}
+                    {% for error in creative_form.errors %}
+                        <div class="alert alert-danger">
+                            <p>{{ error }}</p>
+                        </div>
+                    {% endfor %}
+
+
+                    <!-- begin: approval -->
                     <div id="approval" class="tab-pane">
                         <div class="row">
                             <form role="form" method="post" id="campaign-approval-form">
@@ -117,7 +128,7 @@
                                     <div class="form-group">
                                         <label for="description">Campaign Description</label>
                                         <span class="input-icon icon-right">
-                                            <textarea class="form-control" rows="5"></textarea>
+                                            <textarea class="form-control" name="description" rows="5">{{ campaign.description }}</textarea>
                                             <i class="fa fa-align-left primary"></i>
                                         </span>
                                         <p class="help-block">Please enter a campaign description...</p>
@@ -158,7 +169,7 @@
                                     <div class="form-group">
                                         <label for="objective">Campaign Objective</label>
                                         <span class="input-icon icon-right">
-                                            <textarea class="form-control" rows="5"></textarea>
+                                            <textarea class="form-control" name="objective" rows="5">{{ campaign.objective }}</textarea>
                                             <i class="fa fa-align-left primary"></i>
                                         </span>
                                         <p class="help-block">Please enter a campaign objective...</p>
@@ -194,9 +205,9 @@
                                 </div>
                             </form>
                         </div>
-                    </div><!-- end: leads -->
+                    </div><!-- end: approval -->
 
-
+                    <!-- begin: tracker -->
                     <div id="tracker" class="tab-pane">
                         <div class="row">
                             {% if campaign.status == 'INACTIVE' %}
@@ -261,11 +272,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Capacity: </td>
-                                                    <td>{{ pt.capacity }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Current Load: </td>
+                                                    <td>Campaigns: </td>
                                                     <td>{{ pt.total_campaigns }}</td>
                                                 </tr>
                                             </tbody>
@@ -284,17 +291,17 @@
                                 <div class="col-lg-8">
                                     {{ form.hidden_tag() }}
                                     <div class="form-group">
-                                        <label for="creative_header">Campaign Creative Header</label>
+                                        <label for="creative_header"><strong>Campaign Creative Header</strong></label>
                                         <span class="input-icon icon-right">
-                                            <textarea class="form-control" rows="7"></textarea>
+                                            <textarea class="form-control" name="creative_header" rows="7">{{ campaign.creative_header }}</textarea>
                                             <i class="fa fa-align-left purple"></i>
                                         </span>
                                         <p class="help-block">Please enter a campaign creative header</p>
                                     </div>
                                     <div class="form-group">
-                                        <label for="creative_footer">Campaign Description</label>
+                                        <label for="creative_footer"><strong>Campaign Description</strong></label>
                                         <span class="input-icon icon-right">
-                                            <textarea class="form-control" rows="7"></textarea>
+                                            <textarea class="form-control" name="creative_footer" rows="7">{{ campaign.creative_footer}}</textarea>
                                             <i class="fa fa-align-left purple"></i>
                                         </span>
                                         <p class="help-block">Please enter a campaign creative footer.</p>
@@ -315,7 +322,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div><!-- end: creative -->
 
                     <!-- begin: visitors -->
                     <div id="visitors" class="tab-pane">
@@ -348,6 +355,7 @@
                                                 </span>
                                             </form>
                                         </div>
+
                                         {% if not visitors %}
 
                                             <div class="alert alert-warning fade in" style="margin-top: 25px;">
@@ -391,21 +399,96 @@
                                                     </tr>
                                                 </tfoot>
                                             </table>
-
-
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div><!-- end: visitors -->
 
+                    <!-- begin: leads -->
                     <div id="leads" class="tab-pane">
                         <div class="row">
-                            show the leads list
+                            <div class="col-lg-12">
+                                <div class="widget">
+                                    <div class="widget-header bg-success">
+                                        <i class="widget-icon fa fa-address-card-o"></i>
+                                        <span class="widget-caption">Campaign Leads</span>
+                                    </div>
+                                    <div class="widget-body">
+                                        <div style="padding: 7px;">
+                                            <form class="form-inline" method="post" id="search-leads">
+                                                <div class="form-group">
+                                                    <span class="input-icon">
+                                                        <input type="text" name="q" class="form-control input-md" placeholder="Search Leads">
+                                                        <i class="fa fa-search danger circular"></i>
+                                                    </span>
+                                                </div>
+                                                <span class="pull-right">
+                                                    <div class="form-group">
+                                                        <label>Records Per Page</label>
+                                                        <select name="show_xrecords" class="form-control input-md">
+                                                            <option value="10">10</option>
+                                                            <option value="25">25</option>
+                                                            <option value="50">50</option>
+                                                            <option value="100">100</option>
+                                                        </select>
+                                                    </div>
+                                                </span>
+                                            </form>
+                                        </div>
+
+                                        {% if not leads %}
+
+                                            <div class="alert alert-warning fade in" style="margin-top: 25px;">
+                                                <button class="close" data-dismiss="alert">&times;</button>
+                                                    <i class="fa-fw fa fa-warning"></i>
+                                                        <strong>Warning</strong> This campaign has not yet converted visitors into leads.  Please check back later.
+                                            </div>
+
+                                        {% else %}
+
+                                            <table class="table table-hover table-striped">
+                                                <thead class="bordered-primary">
+                                                    <tr>
+                                                        <th>Lead Name</th>
+                                                        <th>Created Date</th>
+                                                        <th>Email</th>
+                                                        <th>Address</th>
+                                                        <th>City, State, Zip</th>
+                                                        <th>Phone</th>
+                                                        <th>Auto Info</th>
+                                                        <th>Processed</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for lead in leads %}
+                                                    <tr>
+                                                        <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+                                                        <td>{{ lead.created_date|formatdate }}</td>
+                                                        <td>{{ lead.email }}</td>
+                                                        <td>{{ lead.address1 }}</td>
+                                                        <td>{{ lead.city }}  {{ lead.state }} {{ lead.zip_code }}</td>
+                                                        <td>{{ lead.home_phone }} {{ lead.cell_phone }}</td>
+                                                        <td>{{ lead.car_year }} {{ lead.car_make }} {{ lead.car_model }}</td>
+                                                        <td>{% if lead.processed %}<span class="label label-success">True</span>{% else %}<span class="label label-danger">NOT PROCESSED</span>{% endif %}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td><i class="fa fa-info-circle"></i> Showing Last 100 Leads...</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div><!-- end: leads -->
 
+                    <!-- begin: settings -->
                     <div id="settings" class="tab-pane active">
                         <div class="row">
                             <form role="form" method="post" id="edit-campaign-form">
@@ -514,7 +597,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div><!-- end: settings -->
                 </div><!-- end: tab-content -->
             </div><!-- end: tabbable -->
         </div><!-- end: profile body -->

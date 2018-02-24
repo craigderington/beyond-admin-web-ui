@@ -8,16 +8,16 @@ The portal is comprised of:
     Create and manager users, roles and permissions
 
 2.  Store Manager
-    Create and manage stores using the EARL service
-    Add store creative
-    Create store users for dealer website
+    Create and manage stores using the EARL dPixel service
 
 3.  Campaign Manager
     Create and manage Store's Campaigns
     Start, stop, suspend Campaigns
+    Add creative for dealer email to visitors
+    Manage campaign approval and funding
 
 4.  Manage Campaign Types
-    Edit the list of campaign types
+    Add, Edit to the list of Campaign Types
 
 
 5.  Pixel Tracker Admin
