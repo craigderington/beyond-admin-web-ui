@@ -446,7 +446,7 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    user = User.query.filter_by(username=username).first()
+    user = db_session.query(User).filter_by(username=username).first()
 
     if user:
 
