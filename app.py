@@ -17,7 +17,7 @@ import random
 import string
 import time
 
-debug = True
+debug = False
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -421,7 +421,7 @@ def leads():
 
 
 @app.route('/reports', methods=['GET'])
-#@login_required
+@login_required
 def reports():
 
     form = ReportFilterForm()
@@ -507,8 +507,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = 5580
 
-    if 'run' in args.command:
-        app.run(
-            debug=debug,
-            port=port
-        )
+    app.run(
+        debug=debug,
+        port=port
+    )
