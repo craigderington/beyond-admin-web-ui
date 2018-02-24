@@ -52,7 +52,7 @@ def shutdown_session(exception=None):
 @login_manager.user_loader
 def load_user(id):
     try:
-        return User.query.get(int(id))
+        return db_session.query(User).get(int(id))
     except exc.SQLAlchemyError as err:
         return None
 
@@ -85,7 +85,7 @@ def stores():
     """
     store_count = 0
 
-    stores = Store.query.filter(
+    stores = db_session.query(Store).filter(
         Store.status == 'Active'
     ).all()
 
@@ -108,11 +108,11 @@ def store_detail(store_pk_id):
     :return: store obj
     """
 
-    store = Store.query.filter(
+    store = db_session.query(Store).filter(
         Store.id == store_pk_id
     ).one()
 
-    campaigns = Campaign.query.order_by(
+    campaigns = db_session.query(Campaign).order_by(
         Campaign.created_date.desc()
     ).filter(
         Campaign.store_id == store_pk_id
@@ -200,7 +200,7 @@ def campaigns():
     """
     campaign_count = 0
 
-    campaigns = Campaign.query.order_by(
+    campaigns = db_session.query(Campaign).order_by(
         Campaign.created_date.desc()).filter(
         Campaign.status == 'Active'
     ).limit(100).all()
@@ -231,7 +231,7 @@ def campaign_detail(campaign_pk_id):
     creative_form = CampaignCreativeForm()
 
     # first, get our campaign
-    campaign = Campaign.query.filter(
+    campaign = db_session.query(Campaign).filter(
         Campaign.id == campaign_pk_id
     ).one()
 
@@ -263,8 +263,10 @@ def campaign_detail(campaign_pk_id):
             campaign.objective = approval_form.objective.data
             campaign.frequency = approval_form.frequency.data
 
+            # commit to the database
             db_session.commit()
 
+            # flash message and redirect
             flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='info')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
 
@@ -273,27 +275,28 @@ def campaign_detail(campaign_pk_id):
             campaign.creative_footer = creative_form.creative_footer.data
             db_session.commit()
 
-            # flash a success message
+            # flash a success message and redirect
             flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='info')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
 
     if campaign:
 
-        visitors = Visitor.query.filter(and_(
+        visitors = db_session.query(Visitor).filter(and_(
             Visitor.job_number == campaign.job_number,
             Visitor.campaign_id == campaign.id
         )).all()
 
-        store = Store.query.filter(
+        store = db_session.query(Store).filter(
             Store.id == campaign.store_id
         ).one()
 
         if campaign.pixeltrackers_id:
-            pt = PixelTracker.query.get(campaign.pixeltrackers_id)
+            pt = db_session.query(PixelTracker).get(campaign.pixeltrackers_id)
 
         stmt = text("SELECT v.id, av.* from visitors v, appendedvisitors av where v.id = av.visitor "
                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
 
-        leads = AppendedVisitor.query.from_statement(stmt).all()
+        leads = db_session.query(AppendedVisitor).from_statement(stmt).all()
         campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
         visitor_count = len(visitors)
         lead_count = len(leads)
@@ -374,12 +377,12 @@ def create_pixel(campaign_pk_id):
     """
 
     # get our list of active trackers
-    tracker = PixelTracker.query.filter(
+    tracker = db_session.query(PixelTracker).filter(
         PixelTracker.active == 1
     ).one()
 
     # get the campaign instance
-    campaign = Campaign.query.get(campaign_pk_id)
+    campaign = db_session.query(Campaign).get(campaign_pk_id)
 
     if campaign:
         if tracker:
@@ -389,12 +392,12 @@ def create_pixel(campaign_pk_id):
             campaign.status = 'ACTIVE'
             db_session.commit()
 
-            # flash a success message
+            # flash a success message and redirect
             flash('The Campaign Pixel Tracker was assigned to {}.'.format(tracker.name), category='success')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
 
         else:
-            # can not assign a tracker.  set the campaign status to inactive
+            # can not assign a tracker.  set the campaign status to inactive and redirect
             campaign.status = 'INACTIVE'
             db_session.commit()
             flash('Sorry, there are no available Pixel Trackers to assign to this campaign.', category='danger')
@@ -402,7 +405,7 @@ def create_pixel(campaign_pk_id):
 
     else:
 
-        # flash campaign not found
+        # flash campaign not found and redirect
         flash('Sorry, campaign {} was not found.'.format(campaign_pk_id), category='warning')
         return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
 
@@ -425,8 +428,8 @@ def leads():
 def reports():
 
     form = ReportFilterForm()
-    stores = Store.query.order_by('name').filter_by(status='ACTIVE').all()
-    campaigns = Campaign.query.order_by(Campaign.name.asc()).filter_by(status='ACTIVE').all()
+    stores = db_session.query(Store).order_by('name').filter_by(status='ACTIVE').all()
+    campaigns = db_session.query(Campaign).order_by(Campaign.name.asc()).filter_by(status='ACTIVE').all()
 
     return render_template(
         'reports.html',
@@ -502,12 +505,8 @@ def format_date(value):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='EARL Web Frontend')
-    parser.add_argument('command', nargs=1, choices=('run',))
-    args = parser.parse_args()
-    port = 5580
 
+    # start the application
     app.run(
-        debug=debug,
-        port=port
+        debug=debug
     )
