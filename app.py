@@ -41,6 +41,9 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = "/login"
 
+# disable strict slashes
+app.url_map.strict_slashes = False
+
 # set the current date time for each page
 today = datetime.datetime.now().strftime('%c')
 
@@ -421,8 +424,16 @@ def create_pixel(campaign_pk_id):
 
 
 @app.route('/admin', methods=['GET'])
-def admin_menu():
-    pass
+@login_required
+def admin():
+    """
+    Administrative Menu
+    :return: html page
+    """
+    return render_template(
+        'admin.html',
+        today=today
+    )
 
 
 @app.route('/leads', methods=['GET'])
