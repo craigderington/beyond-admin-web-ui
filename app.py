@@ -1,4 +1,5 @@
 from flask import Flask, make_response, redirect, request, Response, render_template, url_for, flash, g
+from flask_sslify import SSLify
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc
@@ -20,6 +21,8 @@ import time
 debug = False
 
 app = Flask(__name__)
+sslify = SSLify(app)
+
 app.secret_key = config.SECRET_KEY
 app.config['MONGO_SERVER'] = config.MONGO_SERVER
 app.config['MONGO_DB'] = config.MONGO_DB
@@ -201,9 +204,12 @@ def campaigns():
     campaign_count = 0
 
     campaigns = db_session.query(Campaign).order_by(
-        Campaign.created_date.desc()).filter(
-        Campaign.status == 'Active'
+        Campaign.created_date.desc()
     ).limit(100).all()
+
+    campaign_types = db_session.query(CampaignType).order_by(
+        CampaignType.name.asc()
+    ).all()
 
     if campaigns:
         campaign_count = len(campaigns)
@@ -211,6 +217,7 @@ def campaigns():
     return render_template(
         'campaigns.html',
         campaigns=campaigns,
+        campaign_types=campaign_types,
         campaign_count=campaign_count,
         today=today
     )
@@ -329,8 +336,8 @@ def campaign_add():
     """
     form = AddCampaignForm(request.form)
 
-    stores = Store.query.order_by(Store.name.asc()).filter_by(status='Active').all()
-    campaign_types = CampaignType.query.order_by(CampaignType.name.asc()).all()
+    stores = db_session.query(Store).order_by(Store.name.asc()).filter_by(status='Active').all()
+    campaign_types = db_session.query(CampaignType).order_by(CampaignType.name.asc()).all()
 
     if request.method == 'POST' and form.validate_on_submit():
 
@@ -347,7 +354,10 @@ def campaign_add():
             end_date=form.end_date.data,
             radius=form.radius.data,
             client_id=form.client_id.data,
-            pixeltrackers_id=1
+            approved=0,
+            funded=0,
+            creative_header='Enter Header',
+            creative_footer='Enter Footer'
         )
 
         # add the new data object and commit
@@ -513,7 +523,10 @@ def format_date(value):
 
 if __name__ == '__main__':
 
+    port = 5580
+
     # start the application
     app.run(
-        debug=debug
+        debug=debug,
+        port=port
     )

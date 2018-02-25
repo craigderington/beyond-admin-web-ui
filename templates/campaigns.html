@@ -12,70 +12,91 @@
 
         <div class="well with-header with-footer">
             <div class="header bg-success">
-                <i class="fa fa-th-list"></i> <strong>Active Campaign List</strong>
+                <i class="fa fa-th-list"></i> <strong>Campaign List | Showing All Campaigns</strong>
             </div>
-            <span class="pull-left">
-                <div class="form-group">
-                    <span class="input-icon inverted">
-                        <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Campaigns">
-                        <i class="fa fa-search bg-default"></i>
-                    </span>
-                </div>
-            </span>
-            <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
-                <a href="{{ url_for('campaign_add') }}" class="btn btn-sm btn-default .shiny">
-                    <i class="fa fa-plus-square"></i> Add Campaign
-                </a>
-            </span>
-
-            <table class="table table-hover table-striped">
-                <thead class="bordered-primary">
-                    <tr>
-                        <th>Campaign Name</th>
-                        <th>Campaign Type</th>
-                        <th>Job Number</th>
-                        <th>Client ID</th>
-                        <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for campaign in campaigns %}
+            <div class="row">
+                <span class="pull-left">
+                    <form class="form-inline">
+                        <div class="form-group">
+                        <span class="input-icon inverted">
+                            <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Campaigns">
+                            <i class="fa fa-search bg-default"></i>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <select name="campaign_type" style="margin-left:5px;">
+                            <option value="">Filter Campaign Types</option>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    </form>
+                </span>
+                <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
+                    <a href="{{ url_for('campaign_add') }}" class="btn btn-sm btn-default .shiny">
+                        <i class="fa fa-plus-square"></i> Add Campaign
+                    </a>
+                </span>
+            </div>
+            <div class="row"><hr /></div>
+            <div class="row">
+                <table class="table table-hover table-striped">
+                    <thead class="bordered-primary">
                         <tr>
-                            <td><a href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}">{{ campaign.name}}</a></td>
-                            <td>{{ campaign.campaign_type }}</td>
-                            <td>{{ campaign.job_number }}</td>
-                            <td>{{ campaign.client_id }}</td>
-                            <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
-                            <td>{{ campaign.start_date|formatdate}}</td>
-                            <td>{{ campaign.end_date|formatdate }}</td>
-                            <td>
-                                <a class="btn btn-default btn-sm shiny icon-only"
-                                   href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
-                                   title="Get Campaign">
-                                    <i class="fa fa-check-circle"></i>
-                                </a>
-                                <a class="btn btn-default btn-sm shiny icon-only"
-                                   href="{{ url_for('reports') }}"
-                                   title="Campaign Reports">
-                                    <i class="fa fa-bar-chart"></i>
-                                </a>
-                            </td>
+                            <th>Campaign Name</th>
+                            <th>Campaign Type</th>
+                            <th>Job Number</th>
+                            <th>Client ID</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Approved</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="footer">
-                <span class="badge badge-success badge-square">{{ campaign_count }}</span> active campaigns showing...
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                            <tr>
+                                <td><a href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}">{{ campaign.name}}</a></td>
+                                <td>{{ campaign.campaign_type }}</td>
+                                <td>{{ campaign.job_number }}</td>
+                                <td>{{ campaign.client_id }}</td>
+                                <td>{{ campaign.start_date|formatdate}}</td>
+                                <td>{{ campaign.end_date|formatdate }}</td>
+                                <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                                <td>{% if campaign.approved %}
+                                    <span class="label label-purple">APPROVED</span>
+                                    {% else %}
+                                    <span class="label label-warning">NOT APPROVED</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a class="btn btn-default btn-sm shiny icon-only"
+                                       href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
+                                       title="Get Campaign">
+                                        <i class="fa fa-check-circle"></i>
+                                    </a>
+                                    <a class="btn btn-default btn-sm shiny icon-only"
+                                       href="{{ url_for('reports') }}"
+                                       title="Campaign Reports">
+                                        <i class="fa fa-bar-chart"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="footer">
+                    <span class="badge badge-success badge-square">{{ campaign_count }}</span> campaigns showing...
+                </div>
             </div>
         </div>
 
 
     {% else %}
 
-        <h3>There are no active campaigns to display.  Click add campaign to get started...</h3>
+        <h4>There are campaigns to display.  Click <a href="{{ url_for('campaign_add') }}">add campaign</a> to get started...</h4>
 
     {% endif %}
 

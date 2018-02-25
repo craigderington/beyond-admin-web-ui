@@ -212,7 +212,10 @@
                         <div class="row">
                             {% if campaign.status == 'INACTIVE' %}
                             <div class="col-md-8">
-                                <a href="{{ url_for('create_pixel', campaign_pk_id=campaign.id )}}" class="btn btn-lg btn-primary"><i class="fa fa-dot-circle-o"></i> Create Tracking Pixel</a>
+                                <a href="{{ url_for('create_pixel', campaign_pk_id=campaign.id )}}" class="btn btn-lg btn-primary" {% if not campaign.approved %}disabled{% endif %}>
+                                    <i class="fa fa-dot-circle-o"></i> Create Tracking Pixel
+                                </a>
+                                {% if not campaign.approved %}<span class="text-danger"> <small>Campaign Not Yet Approved</small></span>{% endif %}
                             </div>
                             {% else %}
                             <div class="col-md-8">
@@ -570,14 +573,15 @@
                                         <label for="status">Campaign Status:  </label>
                                         <div class="radio">
                                             <label>
-                                                <input name="status" type="radio" value="ACTIVE" {% if campaign.status == 'ACTIVE' %}checked="checked"{% endif %} />
+                                                <input name="status" type="radio" value="ACTIVE" {% if campaign.status == 'ACTIVE' %}checked="checked"{% endif %} disabled />
                                                 <span class="text success">ACTIVE</span>
                                             </label>
                                             <label>
-                                                <input name="status" type="radio" value="INACTIVE" {% if campaign.status == 'INACTIVE' %}checked="checked"{% endif %}/>
+                                                <input name="status" type="radio" value="INACTIVE" {% if campaign.status == 'INACTIVE' %}checked="checked"{% endif %} />
                                                 <span class="text danger">NOT ACTIVE</span>
                                             </label>
                                         </div>
+                                        <p class="help-block text-info">The campaign's status will be updated automatically upon funding and approval.</p>
                                     </div>
 
 
