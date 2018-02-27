@@ -269,6 +269,14 @@ def campaign_detail(campaign_pk_id):
     form = AddCampaignForm()
     approval_form = ApproveCampaignForm()
     creative_form = CampaignCreativeForm()
+    leads = None
+    visitors = None
+    campaign_pixelhash = None
+    visitor_count = 0
+    lead_count = 0
+    open_count = 0
+    pt = None
+    store = None
 
     # first, get our campaign
     campaign = db_session.query(Campaign).filter(
