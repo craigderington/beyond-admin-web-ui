@@ -27,16 +27,16 @@
             <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 profile-stats">
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value primary">4</div>
+                        <div class="stats-value primary">{{ campaign_count }}</div>
                         <div class="stats-title">CAMPAIGNS</div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value darkorange">1803</div>
-                        <div class="stats-title">VISITORS</div>
+                        <div class="stats-value darkorange">{{ contact_count }}</div>
+                        <div class="stats-title">CONTACTS</div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value azure">1207</div>
-                        <div class="stats-title">LEADS</div>
+                        <div class="stats-value azure">{{ store.zip_code }}</div>
+                        <div class="stats-title">RADIUS FROM</div>
                     </div>
                 </div>
                 <div class="row">
@@ -44,10 +44,10 @@
                         <i class="fa fa-map-marker"></i> {{ store.city}}, {{ store.state.upper() }}
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
-                        Phone: <strong>(407) 555-1212</strong>
+                        Phone: <strong>{{ store.phone_number|formatphonenumber }}</strong>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
-                        Email: <strong>email@example.com</strong>
+                        Email: <strong>{{ store.notification_email }}</strong>
                     </div>
                 </div>
             </div>
@@ -125,37 +125,82 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="profile-contacts">
-
-                                    <div class="profile-badge orange"><i class="fa fa-phone orange"></i><span>Contacts</span></div>
                                     <div class="contact-info">
-                                        <p>
-                                            Phone	: 407-555-1212 <br>
-                                            Cell	: 407-555-1314
-                                        </p>
-                                        <p>
-                                            Email	: store@email.com
+                                        <div class="well with-header  with-footer">
+                                            <div class="header bg-blue">
+                                                Store Contact List for {{ store.name }}
+                                            </div>
 
-                                        </p>
-                                        <p>
-
-                                            Web	: http://some-web-site.com
-                                        </p>
+                                            {% if contacts %}
+                                                <table class="table table-hover">
+                                                    <thead class="bordered-darkorange">
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Email</th>
+                                                            <th>Mobile</th>
+                                                            <th>ID</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for contact in contacts %}
+                                                        <tr>
+                                                            <td>{{ contact.first_name }} {{ contact.last_name }}</td>
+                                                            <td>{{ contact.email }}</td>
+                                                            <td>{{ contact.mobile|formatphonenumber }}</td>
+                                                            <td>{{ contact.id }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            <div class="footer">
+                                                <span class="badge badge-success badge-square">{{ contact_count }}</span> store contacts found for {{ store.name }}
+                                            </div>
+                                            {% else %}
+                                                <div class="alert alert-warning fade in">
+                                                    <button class="close" data-dismiss="alert">&times;</button>
+                                                    <i class="fa-fw fa fa-warning"></i>
+                                                    <strong>NO CONTACTS</strong> Please use the form to add new store contacts...
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                    <div class="profile-badge azure">
-                                        <i class="fa fa-map-marker azure"></i><span>Location</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="widget">
+                                    {% for error in contact_form.errors %}
+                                        <div class="alert alert-danger">
+                                            <p>{{error}}</p>
+                                        </div>
+                                    {% endfor %}
+                                    <div class="widget-header bordered-bottom bordered-blue">
+                                        <span class="widget-caption"><i class="fa fa-user-plus"></i> Add Store Contact</span>
                                     </div>
-                                    <div class="contact-info">
-                                        <p>
-                                            Address<br>
-                                            Department 98<br>
-                                            44-46 Morningside Road<br>
-                                            Toronto, Canada
-                                        </p>
-                                        <p>
-                                            Office<br>
-                                            44-46 Morningside Road<br>
-                                            Toronto, Canada
-                                        </p>
+                                    <div class="widget-body">
+                                        <div>
+                                            <form role="form" method="post" name="contact-form" id="contact-form">
+                                                {{ form.hidden_tag() }}
+                                                <div class="form-group">
+                                                    <label for="first_name">First Name</label>
+                                                    <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter first name"  />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="last_name"></label>
+                                                    <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter last name" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="email"></label>
+                                                    <input type="text" class="form-control" name="email" id="email" placeholder="Enter email address" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="mobile"></label>
+                                                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Enter mobile phone number" />
+                                                </div>
+                                                <button type="submit" form="contact-form" class="btn btn-lg btn-darkorange" name="add-new-contact">
+                                                    <i class="fa fa-user-plus"></i>  Add Store Contact
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -221,7 +266,7 @@
                                                class="form-control"
                                                id="state"
                                                name="state"
-                                               value="{{ store.state }}">
+                                               value="{{ store.state.upper() }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="zip_code">Zip Code:</label>
@@ -237,7 +282,7 @@
                                                class="form-control"
                                                id="phone_number"
                                                name="phone_number"
-                                               value="{{ store.phone_number }}">
+                                               value="{{ store.phone_number|formatphonenumber }}">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
@@ -311,7 +356,7 @@
 
                                     <!-- form actions -->
                                     <hr />
-                                    <button type="submit" form="edit-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
+                                    <button type="submit" name="edit-store-form" form="edit-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
                                         <i class="fa fa-save"></i> Save {{ store.name }}
                                     </button>
                                     <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny">

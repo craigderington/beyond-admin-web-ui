@@ -22,7 +22,6 @@ class User(Base):
     changed_on = Column(DateTime, default=datetime.now, nullable=True)
     created_by_fk = Column(Integer)
     changed_by_fk = Column(Integer)
-    token = Column(String(1024))
 
     def __init__(self, username, password):
         self.username = username
@@ -184,6 +183,7 @@ class Store(Base):
     simplifi_company_id = Column(Integer)
     simplifi_client_id = Column(String(255))
     simplifi_name = Column(String(255))
+    system_notifications = Column(String(255))
 
     def __repr__(self):
         return '{}'.format(
@@ -232,6 +232,7 @@ class Campaign(Base):
     client_id = Column(String(20), nullable=False)
     creative_header = Column(Text)
     creative_footer = Column(Text)
+    email_subject = Column(String(255))
 
     def __repr__(self):
         return '{}'.format(
@@ -254,3 +255,12 @@ class PixelTracker(Base):
             self.name
         )
 
+
+class Contact(Base):
+    __tablename__ = 'contacts'
+    id = Column(Integer, primary_key=True)
+    store_id = Column(Integer, ForeignKey('stores.id'))
+    first_name = Column(String(255), nullable=False)
+    last_name = Column(String(255), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    mobile = Column(String(255), unique=True, nullable=False)

@@ -4,25 +4,24 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc
 from database import db_session
-from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker
+from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
-    ReportFilterForm
-import argparse
+    ReportFilterForm, ContactForm
 import config
 import datetime
 import hashlib
-import json
-import os
 import pymongo
-import random
-import string
-import time
 
+
+# debug
 debug = False
 
+
+# app settings
 app = Flask(__name__)
 sslify = SSLify(app)
 
+# app config
 app.secret_key = config.SECRET_KEY
 app.config['MONGO_SERVER'] = config.MONGO_SERVER
 app.config['MONGO_DB'] = config.MONGO_DB
@@ -43,9 +42,6 @@ login_manager.login_view = "/login"
 
 # disable strict slashes
 app.url_map.strict_slashes = False
-
-# set the current date time for each page
-today = datetime.datetime.now().strftime('%c')
 
 
 # clear all db sessions at the end of each request
@@ -77,7 +73,7 @@ def index():
     return render_template(
         'index.html',
         current_user=current_user,
-        today=today
+        today=get_date()
     )
 
 
@@ -102,7 +98,7 @@ def stores():
         'stores.html',
         stores=stores,
         store_count=store_count,
-        today=today
+        today=get_date()
     )
 
 
@@ -124,39 +120,73 @@ def store_detail(store_pk_id):
         Campaign.store_id == store_pk_id
     ).limit(100).all()
 
+    contacts = db_session.query(Contact).order_by(
+        Contact.last_name.asc()
+    ).filter(
+        Contact.store_id == store.id
+    ).all()
+
+    campaign_count = len(campaigns)
+    contact_count = len(contacts)
     form = AddStoreForm(request.form)
+    contact_form = ContactForm(request.form)
 
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST':
 
-        # update our instance of store
-        store.client_id = form.client_id.data
-        store.status = form.status.data
-        store.name = form.name.data
-        store.address1 = form.address1.data
-        store.address2 = form.address2.data
-        store.city = form.city.data
-        store.state = form.state.data.upper()
-        store.zip_code = form.zip_code.data
-        store.phone_number = form.phone_number.data
-        store.adf_email = form.adf_email.data
-        store.notification_email = form.notification_email.data
-        store.reporting_email = form.reporting_email.data
-        store.simplifi_client_id = form.simplifi_client_id.data
-        store.simplifi_company_id = form.simplifi_company_id.data
-        store.simplifi_name = form.simplifi_name.data
+        if 'edit-store-form' in request.form.keys() and form.validate_on_submit():
 
-        # commit to the database
-        db_session.commit()
+            # update our instance of store
+            store.client_id = form.client_id.data
+            store.status = form.status.data
+            store.name = form.name.data
+            store.address1 = form.address1.data
+            store.address2 = form.address2.data
+            store.city = form.city.data
+            store.state = form.state.data.upper()
+            store.zip_code = form.zip_code.data
+            store.phone_number = form.phone_number.data
+            store.adf_email = form.adf_email.data
+            store.notification_email = form.notification_email.data
+            store.reporting_email = form.reporting_email.data
+            store.simplifi_client_id = form.simplifi_client_id.data
+            store.simplifi_company_id = form.simplifi_company_id.data
+            store.simplifi_name = form.simplifi_name.data
 
-        flash('The store details were saved successfully...', category='success')
-        return redirect(url_for('store_detail', store_pk_id=store.id))
+            # commit to the database
+            db_session.commit()
+
+            # flash a message and redirect
+            flash('The store details were saved successfully...', category='success')
+            return redirect(url_for('store_detail', store_pk_id=store.id))
+
+        elif 'add-new-contact' in request.form.keys() and contact_form.validate_on_submit():
+
+            # add the store contact
+            new_contact = Contact(
+                store_id=store.id,
+                first_name=contact_form.first_name.data,
+                last_name=contact_form.last_name.data,
+                email=contact_form.email.data,
+                mobile=contact_form.mobile.data
+            )
+
+            # commit to the database
+            db_session.add(new_contact)
+            db_session.commit()
+
+            # flash a message and redirect
+            return redirect(url_for('store_detail', store_pk_id=store.id) + '#contacts')
 
     return render_template(
         'store_detail.html',
         store=store,
         campaigns=campaigns,
-        today=today,
-        form=form
+        contacts=contacts,
+        campaign_count=campaign_count,
+        today=get_date(),
+        form=form,
+        contact_form=contact_form,
+        contact_count=contact_count
     )
 
 
@@ -193,7 +223,7 @@ def store_add():
     return render_template(
         'store_add.html',
         form=form,
-        today=today
+        today=get_date()
     )
 
 
@@ -222,7 +252,7 @@ def campaigns():
         campaigns=campaigns,
         campaign_types=campaign_types,
         campaign_count=campaign_count,
-        today=today
+        today=get_date()
     )
 
 
@@ -317,7 +347,7 @@ def campaign_detail(campaign_pk_id):
         campaign=campaign,
         visitors=visitors[0:100],
         leads=leads,
-        today=today,
+        today=get_date(),
         form=form,
         approval_form=approval_form,
         creative_form=creative_form,
@@ -377,7 +407,8 @@ def campaign_add():
         'campaign_add.html',
         form=form,
         stores=stores,
-        campaign_types=campaign_types
+        campaign_types=campaign_types,
+        today=get_date()
     )
 
 
@@ -432,7 +463,7 @@ def admin():
     """
     return render_template(
         'admin.html',
-        today=today
+        today=get_date()
     )
 
 
@@ -454,7 +485,7 @@ def reports():
 
     return render_template(
         'reports.html',
-        today=today,
+        today=get_date(),
         form=form,
         campaigns=campaigns,
         stores=stores
@@ -492,7 +523,10 @@ def login():
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    pass
+    return render_template(
+        'profile.html',
+        today=get_date()
+    )
 
 
 @app.route('/logout', methods=['GET'])
@@ -520,6 +554,12 @@ def flash_errors(form):
             ))
 
 
+def get_date():
+    # set the current date time for each page
+    today = datetime.datetime.now().strftime('%c')
+    return '{}'.format(today)
+
+
 @app.template_filter('formatdate')
 def format_date(value):
     dt = value
@@ -530,6 +570,12 @@ def format_date(value):
 def format_date(value):
     dt = value
     return dt.strftime('%m/%d/%Y')
+
+
+@app.template_filter('formatphonenumber')
+def format_phone_number(value):
+    phone_number = value.replace('(-)', '')
+    return '{}-{}-{}'.format(phone_number[:3], phone_number[3:6], phone_number[6:])
 
 
 if __name__ == '__main__':
