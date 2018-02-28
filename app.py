@@ -11,10 +11,11 @@ import config
 import datetime
 import hashlib
 import pymongo
+import phonenumbers
 
 
 # debug
-debug = False
+debug = True
 
 # app settings
 app = Flask(__name__)
@@ -136,10 +137,15 @@ def store_detail(store_pk_id):
     contact_count = len(contacts)
     form = AddStoreForm(request.form)
     contact_form = ContactForm(request.form)
+    storephonenumber = phonenumbers.parse(store.phone_number, 'US')
+    store_phone = phonenumbers.format_number(storephonenumber, phonenumbers.PhoneNumberFormat.NATIONAL)
 
     if request.method == 'POST':
 
         if 'edit-store-form' in request.form.keys() and form.validate_on_submit():
+
+            phone_number = form.phone_number.data
+            parsed_number = phonenumbers.parse(phone_number, 'US')
 
             # update our instance of store
             store.client_id = form.client_id.data
@@ -150,7 +156,7 @@ def store_detail(store_pk_id):
             store.city = form.city.data
             store.state = form.state.data.upper()
             store.zip_code = form.zip_code.data
-            store.phone_number = form.phone_number.data
+            store.phone_number = parsed_number.national_number,
             store.adf_email = form.adf_email.data
             store.notification_email = form.notification_email.data
             store.system_notifications = form.system_notifications.data
@@ -158,6 +164,7 @@ def store_detail(store_pk_id):
             store.simplifi_client_id = form.simplifi_client_id.data
             store.simplifi_company_id = form.simplifi_company_id.data
             store.simplifi_name = form.simplifi_name.data
+            store.system_notifications=form.system_notifications.data
 
             # commit to the database
             db_session.commit()
@@ -189,6 +196,7 @@ def store_detail(store_pk_id):
     return render_template(
         'store_detail.html',
         store=store,
+        store_phone=store_phone,
         campaigns=campaigns,
         contacts=contacts,
         campaign_count=campaign_count,
@@ -209,7 +217,11 @@ def store_add():
     form = AddStoreForm(request.form)
     
     if request.method == 'POST' and form.validate_on_submit():
-        
+
+        # clean the phone number field
+        phone_number = form.phone_number.data
+        parsed_number = phonenumbers.parse(phone_number, 'US')
+
         new_store = Store(
             client_id=form.client_id.data,
             name=form.name.data,
@@ -219,7 +231,7 @@ def store_add():
             state=form.state.data.upper(),
             zip_code=form.zip_code.data,
             status=form.status.data,
-            phone_number=form.phone_number.data,
+            phone_number=parsed_number.national_number,
             notification_email=form.notification_email.data,
             reporting_email=form.reporting_email.data,
             system_notifications=form.system_notifications.data
