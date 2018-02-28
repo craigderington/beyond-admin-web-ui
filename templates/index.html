@@ -1,10 +1,94 @@
 {% extends "_layout.html" %}
 {% block title %}EARL Admin: Homepage{% endblock %}
-
-{% block page_header %}Dashboard{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('index') }}">Dashboard</a></li>
+{% endblock %}
 {% block content %}
 
-<h3>First Beyond Admin Page</h3>
+<div class="row">
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number sky">
+                    <i class="fa fa-bank fa-2x text-sky"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-sky bg-white">
+                <span class="databox-number sky">{{ dashboard.stores }}</span>
+                <div class="databox-text darkgray">TOTAL STORES</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number sky">
+                    <i class="fa fa-check-circle-o fa-2x text-primary"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-primary bg-white">
+                <span class="databox-number primary">{{ dashboard.active_stores }}</span>
+                <div class="databox-text darkgray">ACTIVE STORES</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number success">
+                    <i class="fa fa-th-list fa-2x text-success"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-success bg-white">
+                <span class="databox-number success">{{ dashboard.campaigns }}</span>
+                <div class="databox-text darkgray">TOTAL CAMPAIGNS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number darkorange">
+                    <i class="fa fa-bar-chart fa-2x text-darkorange"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-darkorange bg-white">
+                <span class="databox-number darkorange">{{ dashboard.active_campaigns }}</span>
+                <div class="databox-text darkgray">ACTIVE CAMPAIGNS</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+        <div class="databox databox-xxlg databox-vertical databox-shadowed bg-white radius-bordered padding-5">
+            <div class="databox-bottom">
+                <div class="databox-row row-12">
+                    <div class="databox-cell cell-5 text-center no-padding-left padding-bottom-30">
+                        <div class="databox-row row-2 bordered-bottom bordered-ivory padding-10">
+                            <span class="databox-text sonic-silver pull-left no-margin">Campaign Types</span>
+                            <span class="databox-text sonic-silver pull-right no-margin uppercase">Count</span>
+                        </div>
+                        {% for ct in campaign_types %}
+                        <div class="databox-row row-2 bordered-bottom bordered-ivory padding-10">
+                            <span class="badge badge-blue badge-empty pull-left margin-5"></span>
+                            <span class="databox-text darkgray pull-left no-margin hidden-xs">{{ ct.name }}</span>
+                            <span class="databox-text darkgray pull-right no-margin uppercase">{{ ct.ctcount }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 {% endblock %}

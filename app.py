@@ -2,7 +2,7 @@ from flask import Flask, make_response, redirect, request, Response, render_temp
 from flask_sslify import SSLify
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy, Pagination
-from sqlalchemy import text, and_, exc
+from sqlalchemy import text, and_, exc, func
 from database import db_session
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
@@ -15,7 +15,6 @@ import pymongo
 
 # debug
 debug = False
-
 
 # app settings
 app = Flask(__name__)
@@ -70,9 +69,16 @@ def before_request():
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
+    """
+    The default view.   Dashboard
+    :return: databoxes
+    """
+
     return render_template(
         'index.html',
         current_user=current_user,
+        dashboard=get_dashboard(),
+        campaign_types=get_campaign_types(),
         today=get_date()
     )
 
@@ -560,6 +566,42 @@ def flash_errors(form):
                 getattr(form, field).label.text,
                 error
             ))
+
+
+def get_dashboard():
+    """
+    Get the dashboard data
+    :return: dict
+    """
+
+    dashboard = {}
+    stores = db_session.query(Store).count()
+    campaigns = db_session.query(Campaign).count()
+    active_stores = db_session.query(Store).filter_by(status='ACTIVE').count()
+    active_campaigns = db_session.query(Campaign).filter_by(status='ACTIVE').count()
+
+    dashboard['stores'] = stores
+    dashboard['campaigns'] = campaigns
+    dashboard['active_stores'] = active_stores
+    dashboard['active_campaigns'] = active_campaigns
+
+    return dashboard
+
+
+def get_campaign_types():
+    """
+    Get a list of campaign types
+    :return: query object
+    """
+
+    stmt = text("SELECT DISTINCT(ct.name), count(*) as ctcount "
+                "FROM campaigntypes ct, campaigns c "
+                "WHERE ct.id = c.type "
+                "GROUP BY ct.name "
+                "ORDER BY ct.name ASC")
+
+    campaign_types = db_session.query('name', 'ctcount').from_statement(stmt).all()
+    return campaign_types
 
 
 def get_date():
