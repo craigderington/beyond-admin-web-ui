@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, DateField, SelectField, RadioField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, Length
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Length, EqualTo
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from models import CampaignType, Store
 from sqlalchemy import text
@@ -83,3 +83,18 @@ class ContactForm(FlaskForm):
     last_name = StringField('Last Name:', validators=[DataRequired()])
     email = StringField('Email Address:', validators=[DataRequired()])
     mobile = StringField('Mobile Phone:', validators=[DataRequired()])
+
+
+class UserProfileForm(FlaskForm):
+    first_name = StringField('First Name:', validators=[DataRequired()])
+    last_name = StringField('Last Name:', validators=[DataRequired()])
+    username = StringField('Username:', validators=[DataRequired()])
+    email = StringField('Email:', validators=[DataRequired()])
+
+
+class ChangeUserPasswordForm(FlaskForm):
+    current_password = PasswordField('Current Password:', validators=[DataRequired()])
+    password = PasswordField('Password:', validators=[DataRequired(),
+                                                      EqualTo('confirm_password',
+                                                              message='The passwords do not match')])
+    confirm_password = PasswordField('Confirm Password:', validators=[DataRequired()])

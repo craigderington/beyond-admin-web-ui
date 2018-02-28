@@ -6,7 +6,7 @@ from sqlalchemy import text, and_, exc, func
 from database import db_session
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
-    ReportFilterForm, ContactForm
+    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm
 import config
 import datetime
 import hashlib
@@ -14,7 +14,7 @@ import pymongo
 
 
 # debug
-debug = True
+debug = False
 
 # app settings
 app = Flask(__name__)
@@ -553,9 +553,58 @@ def login():
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
+    """
+    Allow user to edit their personal profile
+    :return: user
+    """
+    # set the user instance
+    user = db_session.query(User).get(current_user.get_id())
+    form = UserProfileForm(request.form)
+    change_password_form = ChangeUserPasswordForm(request.form)
+
+    if request.method == 'POST':
+
+        if 'save-profile-form' in request.form.keys() and form.validate_on_submit():
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.email = form.email.data
+
+            # commit to the database
+            db_session.commit()
+
+            # flash a message and redirect
+            flash('Your user profile has been successfully updated...', category='success')
+            return redirect(url_for('profile'))
+
+        elif 'change-password-form' in request.form.keys() and change_password_form.validate_on_submit():
+
+            if user:
+
+                # check the existing password
+                if user.check_password(form.current_password.data):
+
+                    # save the new password
+                    user.password = user.set_password(form.password.data)
+
+                    # commit to the database
+                    db_session.commit()
+
+                    # flash a message and redirect
+                    flash('Your password was successfully changed...  Please make a note of this change.', category='info')
+                    return redirect(url_for('profile'))
+
+                else:
+
+                    # flash a message that the password is wrong or does not match
+                    flash('Sorry, the password does not match; incorrect password...', category='danger')
+                    return redirect(url_for('profile'))
+
     return render_template(
         'profile.html',
-        today=get_date()
+        user=user,
+        today=get_date(),
+        form=form,
+        change_password_form=change_password_form
     )
 
 

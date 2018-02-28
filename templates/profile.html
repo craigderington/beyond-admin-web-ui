@@ -1,0 +1,170 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Add Store Campaign{% endblock %}
+{% block page_header %}Add Store Campaign{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('profile') }}">Profile</a></li>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="widget radius-bordered">
+        <div class="widget-header">
+            <span class="widget-caption"><i class="fa fa-address-card-o"></i> {{ user.first_name }} {{ user.last_name }}</span>
+        </div>
+        <div class="widget-body">
+            <div class="tabbable">
+                <div class="tab-content tabs-flat">
+                    <ul class="nav nav-tabs tabs-flat">
+                        <li class="active">
+                            <a href="#info" data-toggle="tab" aria-expanded="false">
+                                <i class="fa fa-user-circle-o"></i> Your Information
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#stats" data-toggle="tab" aria-expanded="true">
+                                <i class="fa fa-circle"></i> Your User Stats
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#change_password" data-toggle="tab" aria-expanded="true">
+                                <i class="fa fa-user-secret"></i> Change Password
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-pane active" id="info">
+                        {% for error in form.errors %}
+                            <div class="alert alert-danger alert-border fade in">
+                                <button class="close" data-dismiss="alert">&times;</button>
+                                <p><i class="fa fa-warning"></i> {{error}}</p>
+                            </div>
+                        {% endfor %}
+                        {% for error in change_password_form.errors %}
+                            <div class="alert alert-danger alert-border fade in">
+                                <button class="close" data-dismiss="alert">&times;</button>
+                                <p><i class="fa fa-warning"></i> {{error}}</p>
+                            </div>
+                        {% endfor %}
+                        <form id="profile-form" method="post" name="profile-form" class="form-horizontal">
+                            {{ form.hidden_tag() }}
+                            <div class="form-title" style="margin-top: 15px;">
+                                <i class="fa fa-address-card-o"></i>  Update Your Profile
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">Full name:</label>
+                                <div class="col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="first_name"
+                                           placeholder="First name"
+                                           value="{{ user.first_name }}" />
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="last_name"
+                                           placeholder="Last name"
+                                           value="{{ user.last_name }}"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">Username:</label>
+                                <div class="col-lg-8">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="username"
+                                           value="{{ user.username }}"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">Email address:</label>
+                                <div class="col-lg-8">
+                                    <input class="form-control"
+                                           name="email"
+                                           type="email"
+                                           value="{{ user.email }}" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-lg-offset-4 col-lg-8">
+                                    <button class="btn btn-lg btn-primary" form="profile-form" type="submit" name="save-profile-form">
+                                        <i class="fa fa-save"></i> Save Profile
+                                    </button>
+                                    <a href="{{ url_for('index') }}" class="btn btn-lg btn-default">
+                                        <i class="fa fa-times-circle"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div><!-- end: tab-info-pane -->
+                    <div class="tab-pane" id="stats">
+                        <div class="well well-lg">
+                            <ul style="padding: 10px;">
+                            <li>Status: {% if user.active %}<span class="label label-success">ACTIVE</span>
+                                {% else %}
+                                <span class="label label-danger"> You should not be here.  <a href="{{ url_for('logout')}}">Log out</a></span>
+                                {% endif %}
+                            </li>
+                            <li>Last Login: {{ user.last_login|formatdate}}</li>
+                            <li>Login Count: {{ user.login_count }}</li>
+                            <li>Fail Login Count: {{ user.fail_login_count }}</li>
+                            <li>Created On: {{ user.created_on| formatdate  }}</li>
+                            <li>Last Change: {{ user.changed_on| formatdate }}</li>
+                        </ul>
+                        </div>
+                    </div><!-- end: tab-stats-pane -->
+
+                    <!-- begin: change password pane and form -->
+                    <div class="tab-pane" id="change_password">
+                        <form class="form-horizontal" method="post" name="change-pwd-form" style="margin-top: 25px;">
+
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">Current Password:</label>
+                                <div class="col-lg-8">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="current_password" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">New Password:</label>
+                                <div class="col-lg-8">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="password" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label">Confirm New Password:</label>
+                                <div class="col-lg-8">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="confirm_password" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-offset-4 col-lg-8">
+                                    <button class="btn btn-lg btn-primary" form="profile-form" type="submit" name="change-password-form">
+                                        <i class="fa fa-save"></i> Change Password
+                                    </button>
+                                    <a href="{{ url_for('index') }}" class="btn btn-lg btn-default">
+                                        <i class="fa fa-times-circle"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div><!-- end: tab-change-password-pane -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
