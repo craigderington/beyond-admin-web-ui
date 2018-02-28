@@ -83,9 +83,14 @@
                             Pixel Tracker
                         </a>
                     </li>
-                     <li class="tab-purple">
+                    <li class="tab-purple">
                         <a data-toggle="tab" href="#creative">
                             Campaign Creative
+                        </a>
+                    </li>
+                    <li class="tab-primary">
+                        <a data-toggle="tab" href="#rvm">
+                            Campaign RVM
                         </a>
                     </li>
                     <li class="tab-default">
@@ -104,17 +109,22 @@
                 <div class="tab-content tabs-flat">
                     {% for error in form.errors %}
                         <div class="alert alert-danger">
-                            <p>{{ error }}</p>
+                            <p><i class="fa fa-warning"></i> {{ error }}</p>
                         </div>
                     {% endfor %}
                     {% for error in approval_form.errors %}
                         <div class="alert alert-danger">
-                            <p>{{ error }}</p>
+                            <p><i class="fa fa-warning"></i> {{ error }}</p>
                         </div>
                     {% endfor %}
                     {% for error in creative_form.errors %}
                         <div class="alert alert-danger">
-                            <p>{{ error }}</p>
+                            <p><i class="fa fa-warning"></i> {{ error }}</p>
+                        </div>
+                    {% endfor %}
+                    {% for error in rvm_form.errors %}
+                        <div class="alert alert-danger">
+                            <p><i class="fa fa-warning"></i> {{ error }}</p>
                         </div>
                     {% endfor %}
 
@@ -344,6 +354,64 @@
                             </form>
                         </div>
                     </div><!-- end: creative -->
+
+
+                    <!-- begin: rvm -->
+                    <div id="rvm" class="tab-pane">
+                        <div class="row">
+                            <form role="form" method="post" id="campaign-rvm-form">
+                                <div class="col-lg-8">
+                                    {{ form.hidden_tag() }}
+                                    <div class="form-group">
+                                        <label for="rvm_campaign_id">Campaign RVM ID:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="rvm_campaign_id"
+                                               name="rvm_campaign_id"
+                                               placeholder="Enter RVM ID"
+                                               value="{{ campaign.rvm_campaign_id }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="rvm_limit">Campaign RVM Limit:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="rvm_limit"
+                                               name="rvm_limit"
+                                               placeholder="Enter RVM Send Limit"
+                                               value="{{ campaign.rvm_limit }}">
+                                    </div>
+
+                                    <!-- form actions -->
+                                    <hr />
+                                    <button type="submit"
+                                            form="campaign-rvm-form"
+                                            name="save-campaign-rvm"
+                                            id="save-campaign-rvm"
+                                            value="submit"
+                                            class="btn btn-lg btn-primary .shiny">
+                                        <i class="fa fa-save"></i> Save {{ campaign.name }} RVM Settings
+                                    </button>
+                                    <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="well-lg">
+                                        <p class="help-block">RVM Send Count for {{ campaign.name }}</p>
+                                        {% if campaign.rvm_send_count %}
+                                        <h1>{{ campaign.rvm_send_count }}</h1>
+                                        {% else %}
+                                        <h1>Zero RVMs Sent</h1>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div><!-- end: creative -->
+
+
 
                     <!-- begin: visitors -->
                     <div id="visitors" class="tab-pane">

@@ -6,7 +6,7 @@ from sqlalchemy import text, and_, exc, func
 from database import db_session
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
-    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm
+    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm
 import config
 import datetime
 import hashlib
@@ -15,7 +15,7 @@ import phonenumbers
 
 
 # debug
-debug = True
+debug = False
 
 # app settings
 app = Flask(__name__)
@@ -296,6 +296,7 @@ def campaign_detail(campaign_pk_id):
     form = AddCampaignForm()
     approval_form = ApproveCampaignForm()
     creative_form = CampaignCreativeForm()
+    rvm_form = RVMForm()
     leads = None
     visitors = None
     campaign_pixelhash = None
@@ -329,6 +330,8 @@ def campaign_detail(campaign_pk_id):
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
 
         elif 'save-campaign-approval' in request.form.keys() and approval_form.validate_on_submit():
+
+            # update the campaign data
             campaign.options = approval_form.options.data
             campaign.description = approval_form.description.data
             campaign.funded = approval_form.funded.data
@@ -346,14 +349,31 @@ def campaign_detail(campaign_pk_id):
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
 
         elif 'save-campaign-creative' in request.form.keys() and creative_form.validate_on_submit():
+
+            # update the campaign creative
             campaign.creative_header = creative_form.creative_header.data
             campaign.creative_footer = creative_form.creative_footer.data
             campaign.email_subject = creative_form.email_subject.data
+
+            # commit to the database
             db_session.commit()
 
             # flash a success message and redirect
             flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='info')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+
+        elif 'save-campaign-rvm' in request.form.keys() and rvm_form.validate_on_submit():
+
+            # update the campaign rvm settings
+            campaign.rvm_campaign_id = rvm_form.rvm_campaign_id.data
+            campaign.rvm_limit = rvm_form.rvm_limit.data
+
+            # commit to the database
+            db_session.commit()
+
+            # flash a message and redirect
+            flash('Campaign {} RVM settings were successfully updated...'.format(campaign.name), category='success')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '#rvm')
 
     if campaign:
 
@@ -387,6 +407,7 @@ def campaign_detail(campaign_pk_id):
         form=form,
         approval_form=approval_form,
         creative_form=creative_form,
+        rvm_form=rvm_form,
         store=store,
         campaign_pixelhash=campaign_pixelhash.strip()[-10:],
         pt=pt,

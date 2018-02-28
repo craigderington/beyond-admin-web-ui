@@ -98,3 +98,8 @@ class ChangeUserPasswordForm(FlaskForm):
                                                       EqualTo('confirm_password',
                                                               message='The passwords do not match')])
     confirm_password = PasswordField('Confirm Password:', validators=[DataRequired()])
+
+
+class RVMForm(FlaskForm):
+    rvm_campaign_id = IntegerField('RVM Campaign ID:', validators=[DataRequired()])
+    rvm_limit = IntegerField('RVM Send Limit:', validators=[DataRequired()])

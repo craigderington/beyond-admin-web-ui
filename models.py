@@ -233,6 +233,9 @@ class Campaign(Base):
     creative_header = Column(Text)
     creative_footer = Column(Text)
     email_subject = Column(String(255))
+    rvm_campaign_id = Column(Integer, unique=True, nullable=True, default=0)
+    rvm_send_count = Column(Integer, default=0)
+    rvm_limit = Column(Integer, nullable=False, default=10000)
 
     def __repr__(self):
         return '{}'.format(
