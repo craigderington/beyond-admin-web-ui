@@ -14,7 +14,7 @@ import pymongo
 
 
 # debug
-debug = False
+debug = True
 
 # app settings
 app = Flask(__name__)
@@ -153,6 +153,7 @@ def store_detail(store_pk_id):
             store.phone_number = form.phone_number.data
             store.adf_email = form.adf_email.data
             store.notification_email = form.notification_email.data
+            store.system_notifications = form.system_notifications.data
             store.reporting_email = form.reporting_email.data
             store.simplifi_client_id = form.simplifi_client_id.data
             store.simplifi_company_id = form.simplifi_company_id.data
@@ -181,6 +182,8 @@ def store_detail(store_pk_id):
             db_session.commit()
 
             # flash a message and redirect
+            flash('New Contact {} {} was successfully added...'.format(new_contact.first_name, new_contact.last_name),
+                  category='success')
             return redirect(url_for('store_detail', store_pk_id=store.id) + '#contacts')
 
     return render_template(
@@ -218,12 +221,18 @@ def store_add():
             status=form.status.data,
             phone_number=form.phone_number.data,
             notification_email=form.notification_email.data,
-            reporting_email=form.reporting_email.data
+            reporting_email=form.reporting_email.data,
+            system_notifications=form.system_notifications.data
         )
 
+        # commit to the database
         db_session.add(new_store)
         db_session.commit()
 
+        # flash message and redirect to store detail
+        flash('Store: {}, ID: {} was created successfully... '
+              'Edit the store details here.'.format(new_store.id, new_store.name),
+              category='success')
         return redirect(url_for('store_detail', store_pk_id=new_store.id))
 
     return render_template(
@@ -327,6 +336,7 @@ def campaign_detail(campaign_pk_id):
         elif 'save-campaign-creative' in request.form.keys() and creative_form.validate_on_submit():
             campaign.creative_header = creative_form.creative_header.data
             campaign.creative_footer = creative_form.creative_footer.data
+            campaign.email_subject = creative_form.email_subject.data
             db_session.commit()
 
             # flash a success message and redirect
@@ -382,9 +392,13 @@ def campaign_add():
     :return: new campaign
     """
     form = AddCampaignForm(request.form)
-
     stores = db_session.query(Store).order_by(Store.name.asc()).filter_by(status='Active').all()
     campaign_types = db_session.query(CampaignType).order_by(CampaignType.name.asc()).all()
+    store_id = request.args.get('store_id')
+    client_id = request.args.get('client_id')
+
+    if store_id:
+        store_id = int(store_id)
 
     if request.method == 'POST' and form.validate_on_submit():
 
@@ -407,7 +421,7 @@ def campaign_add():
             creative_footer='Enter Footer'
         )
 
-        # add the new data object and commit
+        # commit to the database
         db_session.add(campaign)
         db_session.commit()
 
@@ -421,6 +435,8 @@ def campaign_add():
         'campaign_add.html',
         form=form,
         stores=stores,
+        store_id=store_id,
+        client_id=client_id,
         campaign_types=campaign_types,
         today=get_date()
     )

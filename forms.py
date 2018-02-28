@@ -48,6 +48,7 @@ class ApproveCampaignForm(FlaskForm):
 class CampaignCreativeForm(FlaskForm):
     creative_header = StringField('Creative Header:', validators=[DataRequired()])
     creative_footer = StringField('Creative Footer:', validators=[DataRequired()])
+    email_subject = StringField('Email Subject:', validators=[DataRequired()])
 
 
 class AddStoreForm(FlaskForm):
@@ -68,7 +69,7 @@ class AddStoreForm(FlaskForm):
     adf_email = StringField('ADF Email:')
     reporting_email = StringField('Reporting Email:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
-    system_notifications = StringField('')
+    system_notifications = StringField('System Notifications:', validators=[DataRequired()])
 
 
 class ReportFilterForm(FlaskForm):

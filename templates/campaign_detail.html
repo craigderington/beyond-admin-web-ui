@@ -241,7 +241,7 @@
                                         </div>
                                     </div>
                                     <div class="widget-body">
-                                        <p>https://pt1.earlbdc.com/api/generate-pixel?job_number={{ campaign.job_number }}&client_id={{ campaign.client_id}}&campaign={{ campaign_pixelhash }}</p>
+                                        <p>https://.../api/generate-pixel?job_number={{ campaign.job_number }}&client_id={{ campaign.client_id}}&campaign={{ campaign_pixelhash }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -302,12 +302,22 @@
                                         <p class="help-block">Please enter a campaign creative header</p>
                                     </div>
                                     <div class="form-group">
-                                        <label for="creative_footer"><strong>Campaign Description</strong></label>
+                                        <label for="creative_footer"><strong>Campaign Creative Footer</strong></label>
                                         <span class="input-icon icon-right">
                                             <textarea class="form-control" name="creative_footer" rows="7">{{ campaign.creative_footer}}</textarea>
                                             <i class="fa fa-align-left purple"></i>
                                         </span>
                                         <p class="help-block">Please enter a campaign creative footer.</p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="email_subject">Campaign Creative Email Subject:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="email_subject"
+                                               name="email_subject"
+                                               placeholder="Enter Custom Email Subject Line"
+                                               value="{{ campaign.email_subject }}">
                                     </div>
 
                                     <!-- form actions -->
@@ -323,6 +333,14 @@
                                     <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
 
                                 </div>
+
+                                <div class="col-lg-4">
+                                    <div class="well-lg">
+                                        <pre>{{ campaign.creative_header }}</pre>
+                                        <pre>{{ campaign.creative_footer }}</pre>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div><!-- end: creative -->

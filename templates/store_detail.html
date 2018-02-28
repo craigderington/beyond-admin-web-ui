@@ -76,49 +76,67 @@
 
                 <div class="tab-content tabs-flat">
                     <div id="campaigns" class="tab-pane">
-                        <table class="table table-hover table-striped">
-                            <thead class="bordered-primary">
-                                <tr>
-                                    <th>Campaign Name</th>
-                                    <th>Campaign Type</th>
-                                    <th>Job Number</th>
-                                    <th>Client ID</th>
-                                    <th>Status</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for campaign in campaigns %}
+                        {% if campaigns %}
+                            <span class="pull-right" style="margin-bottom: 10px;">
+                                <a href="{{ url_for('campaign_add', store_id=store.id, client_id=store.client_id) }}"
+                                   class="btn btn-md btn-primary">
+                                    <i class="fa fa-plus-square"></i>
+                                    Add {{ store.name }} Campaign
+                                </a>
+                            </span>
+                            <table class="table table-hover table-striped">
+                                <thead class="bordered-primary">
                                     <tr>
-                                        <td>{{ campaign.name}}</td>
-                                        <td>{{ campaign.campaign_type }}</td>
-                                        <td>{{ campaign.job_number }}</td>
-                                        <td>{{ campaign.client_id }}</td>
-                                        <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span>
-                                            {% if campaign.status == 'INACTIVE' %}<a href="" class="btn btn-xs btn-azure .shiny icon-only" title="'Activate Campaign">
-                                                <i class="fa fa-cog"></i></a>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ campaign.start_date|formatdate}}</td>
-                                        <td>{{ campaign.end_date|formatdate }}</td>
-                                        <td>
-                                            <a class="btn btn-default btn-sm shiny icon-only"
-                                               href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
-                                               title="Get Campaign">
-                                                <i class="fa fa-check-circle"></i>
-                                            </a>
-                                            <a class="btn btn-default btn-sm shiny icon-only"
-                                               href="{{ url_for('stores') }}"
-                                               title="Campaign Reports">
-                                                <i class="fa fa-bar-chart"></i>
-                                            </a>
-                                        </td>
+                                        <th>Campaign Name</th>
+                                        <th>Campaign Type</th>
+                                        <th>Job Number</th>
+                                        <th>Client ID</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Actions</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for campaign in campaigns %}
+                                        <tr>
+                                            <td>{{ campaign.name}}</td>
+                                            <td>{{ campaign.campaign_type }}</td>
+                                            <td>{{ campaign.job_number }}</td>
+                                            <td>{{ campaign.client_id }}</td>
+                                            <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span>
+                                                {% if campaign.status == 'INACTIVE' %}<a href="" class="btn btn-xs btn-azure .shiny icon-only" title="'Activate Campaign">
+                                                    <i class="fa fa-cog"></i></a>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ campaign.start_date|formatdate}}</td>
+                                            <td>{{ campaign.end_date|formatdate }}</td>
+                                            <td>
+                                                <a class="btn btn-default btn-sm shiny icon-only"
+                                                   href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
+                                                   title="Get Campaign">
+                                                    <i class="fa fa-check-circle"></i>
+                                                </a>
+                                                <a class="btn btn-default btn-sm shiny icon-only"
+                                                   href="{{ url_for('stores') }}"
+                                                   title="Campaign Reports">
+                                                    <i class="fa fa-bar-chart"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="alert alert-info fade in">
+                                <button class="close" data-dismiss="alert">&times;</button>
+                                <i class="fa-fw fa fa-info"></i>
+                                <strong>NO CAMPAIGNS FOUND!</strong>
+                                <a href="{{ url_for('campaign_add', store_id=store.id, client_id=store.client_id) }}">
+                                    Click here
+                                </a> to create a new campaign
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div id="contacts" class="tab-pane">
@@ -293,6 +311,15 @@
                                                id="notification_email"
                                                name="notification_email"
                                                value="{{ store.notification_email }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="system_notifications">System Notification Email:</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="system_notifications"
+                                               name="system_notifications"
+                                               placeholder="Enter System Notification Email Address">
                                     </div>
 
                                     <div class="form-group">
