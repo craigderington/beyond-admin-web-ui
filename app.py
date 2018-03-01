@@ -451,7 +451,8 @@ def campaign_add():
             approved=0,
             funded=0,
             creative_header='Enter Header',
-            creative_footer='Enter Footer'
+            creative_footer='Enter Footer',
+            pixeltrackers_id=1
         )
 
         # commit to the database

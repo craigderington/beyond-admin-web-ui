@@ -157,6 +157,13 @@ class Lead(Base):
     sent_adf = Column(Boolean, default=False)
     adf_email_receipt_id = Column(String(255))
     adf_email_validation_message = Column(String(50))
+    rvm_status = Column(String(20), nullable=True)
+    rvm_date = Column(DateTime)
+    rvm_message = Column(String(50))
+    rvm_sent = Column(Boolean, default=0, nullable=False)
+    followup_email_sent_date = Column(DateTime)
+    followup_email_receipt_id = Column(String(255), nullable=True, default='NOID')
+    followup_email_status = Column(String(20), nullable=True, default='NOTSENT')
 
     def __repr__(self):
         return '{}'.format(
