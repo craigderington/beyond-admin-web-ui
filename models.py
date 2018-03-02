@@ -181,7 +181,7 @@ class Store(Base):
     city = Column(String(255), nullable=False)
     state = Column(String(2), nullable=False)
     zip_code = Column(String(10), nullable=False)
-    zip_4 = Column(Integer)
+    zip_4 = Column(String(10))
     status = Column(String(20), default='Active', nullable=False)
     adf_email = Column(String(255))
     notification_email = Column(String(255), nullable=False)
