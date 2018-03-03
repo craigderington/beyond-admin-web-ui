@@ -6,7 +6,7 @@ from sqlalchemy import text, and_, exc, func
 from database import db_session
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
-    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm
+    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm
 import config
 import datetime
 import hashlib
@@ -254,32 +254,41 @@ def store_add():
     )
 
 
-@app.route('/campaigns', methods=['GET'])
+@app.route('/campaigns', methods=['GET', 'POST'])
 @login_required
 def campaigns():
     """
     Get a list of active campaigns
-    :return: campaign list
+    :return: store campaign list
     """
+
+    form = CampaignStoreFilterForm()
+    campaigns = []
     campaign_count = 0
 
-    campaigns = db_session.query(Campaign).order_by(
-        Campaign.created_date.desc()
-    ).limit(100).all()
+    store_filter = db_session.query(Store).filter(
+        Store.status == 'ACTIVE'
+    ).order_by(Store.name.asc()).all()
 
-    campaign_types = db_session.query(CampaignType).order_by(
-        CampaignType.name.asc()
-    ).all()
+    if request.method == 'POST' and form.validate_on_submit():
+        store_id = form.store_id.data
+
+        campaigns = db_session.query(Campaign).filter(
+            Campaign.store_id == store_id
+        ).order_by(
+            Campaign.created_date.desc()
+        ).limit(50).all()
 
     if campaigns:
         campaign_count = len(campaigns)
 
     return render_template(
         'campaigns.html',
+        stores=store_filter,
         campaigns=campaigns,
-        campaign_types=campaign_types,
         campaign_count=campaign_count,
-        today=get_date()
+        today=get_date(),
+        form=form
     )
 
 

@@ -8,35 +8,41 @@
 
 {% block content %}
 
-    {% if campaigns %}
-
         <div class="well with-header with-footer">
             <div class="header bg-success">
-                <i class="fa fa-th-list"></i> <strong>Campaign List | Showing All Campaigns</strong>
+                <i class="fa fa-th-list"></i> <strong>Campaign List | Filter Campaigns By Store </strong>
             </div>
             <div class="row">
-                <span class="pull-left">
-                    <form class="form-inline">
+                {% for error in form.errors %}
+                    <div class="alert alert-danger">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          <p><i class="fa fa-warning"></i> {{ error }}</p>
+                     </div>
+                {% endfor %}
+                <form class="form-inline" method="post" name="store_filter">
+                    {{ form.hidden_tag() }}
+                    <div class="col-lg-8">
                         <div class="form-group">
-                        <span class="input-icon inverted">
-                            <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Campaigns">
-                            <i class="fa fa-search bg-default"></i>
-                        </span>
+                            <span class="btn btn-md btn-primary"><i class="fa fa-search"></i> Filter By Store</span>
+                                <select name="store_id" onchange="this.form.submit();">
+                                    <option value="">Select a Store</option>
+                                    {% for store in stores %}
+                                        <option value="{{ store.id }}">{{ store.name }}</option>
+                                    {% endfor %}
+                                </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <select name="campaign_type" style="margin-left:5px;">
-                            <option value="">Filter Campaign Types</option>
-                            <option value=""></option>
-                        </select>
-                    </div>
-                    </form>
-                </span>
+                </form>
+
                 <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
                     <a href="{{ url_for('campaign_add') }}" class="btn btn-sm btn-default .shiny">
                         <i class="fa fa-plus-square"></i> Add Campaign
                     </a>
                 </span>
             </div>
+
+            {% if campaigns %}
+
             <div class="row"><hr /></div>
             <div class="row">
                 <table class="table table-hover table-striped">
@@ -91,14 +97,16 @@
                     <span class="badge badge-success badge-square">{{ campaign_count }}</span> campaigns showing...
                 </div>
             </div>
+
+             {% else %}
+
+                <div class="alert alert-info alert-block alert-dismissible" style="margin-top: 25px;">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <p><i class="fa fa-warning"></i> The selected store name no campaigns to display.  Please click <a href="{{ url_for('campaign_add') }}">add campaign</a> to get started...</h4></p>
+                </div>
+
+             {% endif %}
+
         </div>
-
-
-    {% else %}
-
-        <h4>There are campaigns to display.  Click <a href="{{ url_for('campaign_add') }}">add campaign</a> to get started...</h4>
-
-    {% endif %}
-
 
 {% endblock %}

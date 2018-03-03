@@ -103,3 +103,7 @@ class ChangeUserPasswordForm(FlaskForm):
 class RVMForm(FlaskForm):
     rvm_campaign_id = IntegerField('RVM Campaign ID:', validators=[DataRequired()])
     rvm_limit = IntegerField('RVM Send Limit:', validators=[DataRequired()])
+
+
+class CampaignStoreFilterForm(FlaskForm):
+    store_id = IntegerField('Store ID:', validators=[DataRequired()])
