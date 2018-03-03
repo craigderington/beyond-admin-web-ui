@@ -13,10 +13,10 @@
     <div class="profile-container">
         <!-- begin: profile header -->
         <div class="profile-header row">
-            <div class="col-lg-2 col-md-4 col-sm-12 text-center">
+            <div class="col-lg-1 col-md-2 col-sm-6 text-center">
                 <i class="fa fa-address-card fa-5x icon-only" style="margin-top: 35px;"></i>
             </div>
-            <div class="col-lg-5 col-md-8 col-sm-12 profile-info">
+            <div class="col-lg-7 col-md-8 col-sm-12 profile-info">
                 <div class="header-fullname"><h1>{{ campaign.name }}<br/>{{ campaign.campaign_type }}</h1></div>
                 {% if campaign.status == 'ACTIVE' %}
                     <a href="#" class="btn btn-success btn-md btn-follow">
@@ -31,7 +31,7 @@
 
                 </div>
             </div>
-            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 profile-stats">
+            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 profile-stats">
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
                         <div class="stats-value primary">{{ visitor_count }}</div>
