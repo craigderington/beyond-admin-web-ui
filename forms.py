@@ -73,9 +73,10 @@ class AddStoreForm(FlaskForm):
 
 
 class ReportFilterForm(FlaskForm):
-    report_date_range = DateField('Start Date:', validators=[DataRequired()])
+    report_date_range = StringField('Start Date:', validators=[DataRequired()])
     store_id = IntegerField('Store:', validators=[DataRequired()])
     campaign_id = IntegerField('Campaign:', validators=[DataRequired()])
+    report_type = StringField('Report Type:', validators=[DataRequired()])
 
 
 class ContactForm(FlaskForm):

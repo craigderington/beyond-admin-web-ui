@@ -15,7 +15,7 @@ import phonenumbers
 
 
 # debug
-debug = False
+debug = True
 
 # app settings
 app = Flask(__name__)
@@ -550,20 +550,84 @@ def leads():
     )
 
 
-@app.route('/reports', methods=['GET'])
+@app.route('/reports', methods=['GET', 'POST'])
 @login_required
 def reports():
 
     form = ReportFilterForm()
     stores = db_session.query(Store).order_by('name').filter_by(status='ACTIVE').all()
-    campaigns = db_session.query(Campaign).order_by(Campaign.name.asc()).filter_by(status='ACTIVE').all()
+    store_id = None
+    store_name = None
+    campaigns = []
+    results = None
+    results_count = 0
+    start_date = None
+    end_date = None
+    report_type = None
+    campaign_id = None
+
+    if request.method == 'POST':
+
+        if 'get-store-campaigns' in request.form.keys():
+            store_id = form.store_id.data
+
+            store = db_session.query(Store).filter(
+                Store.id == store_id
+            ).one()
+
+            store_name = store.name
+
+            campaigns = db_session.query(Campaign).order_by(
+                Campaign.name.asc()).filter_by(
+                status='ACTIVE',
+                store_id=store_id
+            ).all()
+
+        elif 'run-report' in request.form.keys() and form.validate_on_submit():
+            campaign_id = form.campaign_id.data
+            report_type = form.report_type.data
+            campaign_dates = form.report_date_range.data.split('-')
+            start_date = datetime.datetime.strptime(campaign_dates[0].strip() + ' 12:00:00', '%m/%d/%Y %H:%M:%S')
+            end_date = datetime.datetime.strptime(campaign_dates[1].strip() + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            store_id = form.store_id.data
+
+            store = db_session.query(Store).filter(
+                Store.id == store_id
+            ).one()
+
+            store_name = store.name
+
+            if report_type == 'daily-recap':
+                # raw sql report query
+                stmt = text("select av.created_date, av.first_name, av.last_name, av.address1, av.address2, av.city, "
+                            "av.state, av.zip_code, av.zip_4, av.email, av.cell_phone, av.credit_range, av.car_year, "
+                            "av.car_make, av.car_model "
+                            "from visitors v, appendedvisitors av "
+                            "where v.id = av.visitor "
+                            "and v.campaign_id = {} "                            
+                            "and ( v.created_date between '{}' and '{}' ) "
+                            "order by av.last_name, av.first_name asc".format(campaign_id, start_date, end_date))
+
+                results = db_session.query('created_date', 'first_name', 'last_name', 'address1', 'address2',
+                                           'city', 'state', 'zip_code', 'zip_4', 'email', 'cell_phone', 'credit_range',
+                                           'car_year', 'car_make', 'car_model').from_statement(stmt).all()
+                if results:
+                    results_count = len(results)
 
     return render_template(
         'reports.html',
         today=get_date(),
         form=form,
         campaigns=campaigns,
-        stores=stores
+        stores=stores,
+        store_id=store_id,
+        store_name=store_name,
+        results=results,
+        start_date=start_date,
+        end_date=end_date,
+        report_type=report_type,
+        campaign_id=campaign_id,
+        results_count=results_count
     )
 
 
