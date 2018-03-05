@@ -38,7 +38,9 @@ mongo_db = mongo_client[app.config['MONGO_DB']]
 # define our login_manager
 login_manager = LoginManager(app)
 login_manager.init_app(app)
-login_manager.login_view = "/login"
+login_manager.login_view = "/auth/login"
+login_manager.login_message = "Login required to access this site."
+login_manager.login_message_category = "primary"
 
 # disable strict slashes
 app.url_map.strict_slashes = False
@@ -565,7 +567,16 @@ def reports():
     )
 
 
-@app.route("/login", methods=['GET', 'POST'])
+@app.route('/login', methods=['GET'])
+def login_redirect():
+    """
+    Redirect to auth/login
+    :return: redirect url
+    """
+    return redirect(url_for('login'), 302)
+
+
+@app.route("/auth/login", methods=['GET', 'POST'])
 def login():
 
     form = UserLoginForm()
@@ -738,7 +749,7 @@ def format_phone_number(value):
 
 if __name__ == '__main__':
 
-    port = 5580
+    port = 8580
 
     # start the application
     app.run(
