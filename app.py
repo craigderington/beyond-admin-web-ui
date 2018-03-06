@@ -15,7 +15,7 @@ import phonenumbers
 
 
 # debug
-debug = True
+debug = False
 
 # app settings
 app = Flask(__name__)
