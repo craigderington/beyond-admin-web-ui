@@ -19,7 +19,7 @@ import time
 
 
 # debug
-debug = False
+debug = True
 
 # app settings
 app = Flask(__name__)
@@ -236,6 +236,7 @@ def store_detail(store_pk_id):
                 store_id=store.id,
                 first_name=contact_form.first_name.data,
                 last_name=contact_form.last_name.data,
+                title=contact_form.title.data,
                 email=contact_form.email.data,
                 mobile=contact_form.mobile.data
             )
@@ -410,9 +411,6 @@ def campaign_detail(campaign_pk_id):
             # commit to the database
             db_session.commit()
 
-            # set the active tab
-            active_tab = "approval"
-
             # flash message and redirect
             flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='success')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=approval')
@@ -427,9 +425,6 @@ def campaign_detail(campaign_pk_id):
             # commit to the database
             db_session.commit()
 
-            # set the active tab
-            active_tab = "creative"
-
             # flash a success message and redirect
             flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='success')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=creative')
@@ -442,9 +437,6 @@ def campaign_detail(campaign_pk_id):
 
             # commit to the database
             db_session.commit()
-
-            # set the active tab
-            active_tab = "rvm"
 
             # flash a message and redirect
             flash('Campaign {} RVM settings were successfully updated...'.format(campaign.name), category='success')
@@ -586,13 +578,13 @@ def create_pixel(campaign_pk_id):
             campaign.status = 'INACTIVE'
             db_session.commit()
             flash('Sorry, there are no available Pixel Trackers to assign to this campaign.', category='danger')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
 
     else:
 
         # flash campaign not found and redirect
         flash('Sorry, campaign {} was not found.'.format(campaign_pk_id), category='warning')
-        return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+        return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
 
 
 @app.route('/admin', methods=['GET'])

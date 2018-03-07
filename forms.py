@@ -19,8 +19,8 @@ def get_active_stores():
 
 
 class UserLoginForm(FlaskForm):
-    username = StringField('Username', [DataRequired()])
-    password = PasswordField('Password', [DataRequired()])
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
 
 class AddCampaignForm(FlaskForm):
@@ -33,6 +33,7 @@ class AddCampaignForm(FlaskForm):
     radius = IntegerField('Campaign Radius:', validators=[DataRequired()])
     store_id = IntegerField('Store ID:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
+    adf_subject = StringField('ADF Email Subject:')
 
 
 class ApproveCampaignForm(FlaskForm):
@@ -82,6 +83,7 @@ class ReportFilterForm(FlaskForm):
 class ContactForm(FlaskForm):
     first_name = StringField('First Name:', validators=[DataRequired()])
     last_name = StringField('Last Name:', validators=[DataRequired()])
+    title = StringField('Title:', validators=[DataRequired()])
     email = StringField('Email Address:', validators=[DataRequired()])
     mobile = StringField('Mobile Phone:', validators=[DataRequired()])
 
