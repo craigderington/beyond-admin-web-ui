@@ -1,17 +1,21 @@
 from flask import Flask, make_response, redirect, request, Response, render_template, url_for, flash, g
+from flask_mail import Mail, Message
 from flask_sslify import SSLify
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc, func
 from database import db_session
+from celery import Celery
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
     ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm
 import config
+import random
 import datetime
 import hashlib
 import pymongo
 import phonenumbers
+import time
 
 
 # debug
@@ -25,6 +29,14 @@ sslify = SSLify(app)
 app.secret_key = config.SECRET_KEY
 app.config['MONGO_SERVER'] = config.MONGO_SERVER
 app.config['MONGO_DB'] = config.MONGO_DB
+
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = config.MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
+app.config['MAIL_DEFAULT_SENDER'] = config.MAIL_DEFAULT_SENDER
 
 # SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
@@ -44,6 +56,19 @@ login_manager.login_message_category = "primary"
 
 # disable strict slashes
 app.url_map.strict_slashes = False
+
+# Celery config
+app.config['CELERY_BROKER_URL'] = config.CELERY_BROKER_URL
+app.config['CELERY_RESULT_BACKEND'] = config.CELERY_RESULT_BACKEND
+app.config['CELERY_ACCEPT_CONTENT'] = config.CELERY_ACCEPT_CONTENT
+app.config.update(accept_content=['json', 'pickle'])
+
+# Initialize Celery
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
+# Config mail
+mail = Mail(app)
 
 
 # clear all db sessions at the end of each request
@@ -65,6 +90,35 @@ def load_user(id):
 @app.before_request
 def before_request():
     g.user = current_user
+
+
+# tasks sections, for async functions, etc...
+@celery.task(serializer='pickle')
+def send_async_email(msg):
+    """Background task to send an email with Flask-Mail."""
+    with app.app_context():
+        mail.send(msg)
+
+
+@celery.task(bind=True)
+def long_task(self):
+    """Background task that runs a long function with progress reports."""
+    verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
+    adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
+    noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter', 'bit']
+    message = ''
+    total = random.randint(10, 50)
+    for i in range(total):
+        if not message or random.random() < 0.25:
+            message = '{0} {1} {2}...'.format(random.choice(verb),
+                                              random.choice(adjective),
+                                              random.choice(noun))
+        self.update_state(state='PROGRESS',
+                          meta={'current': i, 'total': total,
+                                'status': message})
+        time.sleep(1)
+    return {'current': 100, 'total': 100, 'status': 'Task completed!',
+            'result': 42}
 
 
 # default routes
@@ -335,10 +389,11 @@ def campaign_detail(campaign_pk_id):
             campaign.name = form.name.data
             campaign.status = form.status.data
 
+            # commit to the database
             db_session.commit()
 
             flash('Campaign {} Settings were updated successfully'.format(campaign.name), category='success')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=settings')
 
         elif 'save-campaign-approval' in request.form.keys() and approval_form.validate_on_submit():
 
@@ -355,9 +410,12 @@ def campaign_detail(campaign_pk_id):
             # commit to the database
             db_session.commit()
 
+            # set the active tab
+            active_tab = "approval"
+
             # flash message and redirect
-            flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='info')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+            flash('Campaign {} Approval was updated successfully'.format(campaign.name), category='success')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=approval')
 
         elif 'save-campaign-creative' in request.form.keys() and creative_form.validate_on_submit():
 
@@ -369,9 +427,12 @@ def campaign_detail(campaign_pk_id):
             # commit to the database
             db_session.commit()
 
+            # set the active tab
+            active_tab = "creative"
+
             # flash a success message and redirect
-            flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='info')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id))
+            flash('Campaign {} Creative was saved successfully'.format(campaign.name), category='success')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=creative')
 
         elif 'save-campaign-rvm' in request.form.keys() and rvm_form.validate_on_submit():
 
@@ -382,9 +443,12 @@ def campaign_detail(campaign_pk_id):
             # commit to the database
             db_session.commit()
 
+            # set the active tab
+            active_tab = "rvm"
+
             # flash a message and redirect
             flash('Campaign {} RVM settings were successfully updated...'.format(campaign.name), category='success')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '#rvm')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign.id) + '?=rvm')
 
     if campaign:
 
@@ -509,11 +573,13 @@ def create_pixel(campaign_pk_id):
             # assign the tracker to this campaign
             campaign.pixeltrackers_id == tracker.id
             campaign.status = 'ACTIVE'
+
+            # commit to the database
             db_session.commit()
 
             # flash a success message and redirect
             flash('The Campaign Pixel Tracker was assigned to {}.'.format(tracker.name), category='success')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
 
         else:
             # can not assign a tracker.  set the campaign status to inactive and redirect
@@ -751,6 +817,25 @@ def flash_errors(form):
             ))
 
 
+def send_email(to, subject, **kwargs):
+    """
+    Send Mail function
+    :param to:
+    :param subject:
+    :param template:
+    :param kwargs:
+    :return: celery async task id
+    """
+    msg = Message(
+        subject,
+        sender=app.config['MAIL_DEFAULT_SENDER'],
+        recipients=[to, ]
+    )
+    msg.body = "EARL Dealer Demo UI Test"
+    # msg.html = render_template(template + '.html', **kwargs)
+    send_async_email.delay(msg)
+
+
 def get_dashboard():
     """
     Get the dashboard data
@@ -813,7 +898,7 @@ def format_phone_number(value):
 
 if __name__ == '__main__':
 
-    port = 8580
+    port = 5580
 
     # start the application
     app.run(
