@@ -652,13 +652,13 @@ def reports():
             # raw sql report query
             stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
                         "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
-                        "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id) as total_appends, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id) as total_leads, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_to_dealer = 1) as total_sent_to_dealer, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_adf = 1) as total_adf, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.followup_email = 1) as total_followups, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.rvm_sent = 1) as total_rvms, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.email_verified = 1) as total_email_verified "
+                        "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id) as total_appends, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and v3.campaign_id = c4.id) as total_leads, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_to_dealer = 1 and v3.campaign_id = c4.id) as total_sent_to_dealer, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_adf = 1 and v3.campaign_id = c4.id) as total_adf, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.followup_email = 1 and v3.campaign_id = c4.id) as total_followups, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.rvm_sent = 1 and v3.campaign_id = c4.id) as total_rvms, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.email_verified = 1 and v3.campaign_id = c4.id) as total_email_verified "
                         "from campaigns c, visitors v, stores s, appendedvisitors av, campaigntypes ct "
                         "where c.id = v.campaign_id "
                         "and c.store_id = s.id "
@@ -845,7 +845,7 @@ def get_dashboard():
     total_visitors = db_session.query(Visitor).count()
     total_appends = db_session.query(AppendedVisitor).count()
     total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=True).count()
-    total_followups = db_session.query(Lead).filter_by(followup_email=True, followup_email_status='SENT').count()
+    total_followups = db_session.query(Lead).filter_by(followup_email_status='SENT').count()
     total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='SENT').count()
     append_rate = (total_appends / total_visitors) * 100.0
 
