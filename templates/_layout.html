@@ -27,6 +27,7 @@
     <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/demo.min.css" rel="stylesheet" type="text/css" />
     <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/typicons.min.css" rel="stylesheet" type="text/css" />
     <link href="//s3.amazonaws.com/earl-admin-theme/html/assets/css/animate.min.css" rel="stylesheet" type="text/css" />
+    {% block head %}{% endblock %}
 </head>
 
 <body>
@@ -142,24 +143,13 @@
                     <ul class="breadcrumb">
                         <li>
                             <i class="fa fa-home"></i>
-                            <a href="#">Home</a>
+                            <a href="{{ url_for('index') }}">Home</a>
                         </li>
                         {% block breadcrumbs %}{% endblock %}
                     </ul>
                     <span class="pull-right" style="margin-right: 10px;"><i class="fa fa-clock-o"></i> {{ today }}</span>
                 </div>
                 <!-- end: breadcrumbs -->
-
-                <!-- begin: page header
-                <div class="page-header position-relative">
-                    <div class="header-title">
-                        <h1>
-                            <strong>{% block page_header %}{% endblock %}</strong>
-                        </h1>
-
-                    </div>
-                </div>
-                end: page header -->
 
                 <!-- begin: page body -->
                 <div class="page-body">

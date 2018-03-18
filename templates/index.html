@@ -23,7 +23,7 @@
     <div class="col-lg-3 col-sm-6 col-xs-12">
         <div class="databox databox-lg radius-bordered databox-shadowed">
             <div class="databox-left bg-white">
-                <span class="databox-number sky">
+                <span class="databox-number primary">
                     <i class="fa fa-check-circle-o fa-2x text-primary"></i>
                 </span>
             </div>
@@ -62,6 +62,97 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number sky">
+                    <i class="fa fa-users fa-2x text-sky"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-sky bg-white">
+                <span class="databox-number sky">{{ dashboard.total_visitors }}</span>
+                <div class="databox-text darkgray">TOTAL VISITORS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number primary">
+                    <i class="fa fa-check-square-o fa-2x text-primary"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-primary bg-white">
+                <span class="databox-number primary">{{ dashboard.total_appends }}</span>
+                <div class="databox-text darkgray">TOTAL APPENDS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number success">
+                    <i class="fa fa-percent fa-2x text-success"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-success bg-white">
+                <span class="databox-number success">{{ '%0.2f'|format(dashboard.append_rate|float) }} %</span>
+                <div class="databox-text darkgray">APPEND RATE</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number sky">
+                    <i class="fa fa-envelope-square fa-2x text-sky"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-sky bg-white">
+                <span class="databox-number sky">{{ dashboard.total_dealer }}</span>
+                <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number primary">
+                    <i class="fa fa-envelope-open-o fa-2x text-dark"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-primary bg-white">
+                <span class="databox-number primary">{{ dashboard.total_followups }}</span>
+                <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number success">
+                    <i class="fa fa-mobile fa-2x text-success"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-success bg-white">
+                <span class="databox-number success">{{ dashboard.total_rvms }}</span>
+                <div class="databox-text darkgray">TOTAL RVMS SENT</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
         <div class="databox databox-xxlg databox-vertical databox-shadowed bg-white radius-bordered padding-5">

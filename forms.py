@@ -64,9 +64,7 @@ class AddStoreForm(FlaskForm):
     notification_email = StringField('Notification Email:',
                                      validators=[DataRequired(
                                          message='The notification email address is required to create a new store')])
-    simplifi_company_id = IntegerField('SimpliFi ID:')
     simplifi_client_id = StringField('SimpliFi ClientID:')
-    simplifi_name = StringField('SimpliFi Name:')
     adf_email = StringField('ADF Email:')
     reporting_email = StringField('Reporting Email:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
@@ -74,10 +72,8 @@ class AddStoreForm(FlaskForm):
 
 
 class ReportFilterForm(FlaskForm):
-    report_date_range = StringField('Start Date:', validators=[DataRequired()])
+    report_date_range = StringField('Start Date:', )
     store_id = IntegerField('Store:', validators=[DataRequired()])
-    campaign_id = IntegerField('Campaign:', validators=[DataRequired()])
-    report_type = StringField('Report Type:', validators=[DataRequired()])
 
 
 class ContactForm(FlaskForm):

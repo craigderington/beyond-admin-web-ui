@@ -19,7 +19,7 @@ import time
 
 
 # debug
-debug = True
+debug = False
 
 # app settings
 app = Flask(__name__)
@@ -218,8 +218,6 @@ def store_detail(store_pk_id):
             store.system_notifications = form.system_notifications.data
             store.reporting_email = form.reporting_email.data
             store.simplifi_client_id = form.simplifi_client_id.data
-            store.simplifi_company_id = form.simplifi_company_id.data
-            store.simplifi_name = form.simplifi_name.data
             store.system_notifications=form.system_notifications.data
 
             # commit to the database
@@ -459,11 +457,17 @@ def campaign_detail(campaign_pk_id):
         stmt = text("SELECT v.id, av.* from visitors v, appendedvisitors av where v.id = av.visitor "
                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
 
+        stmt2 = text("SELECT count(l.id) as total_sent "
+                     "from visitors v, appendedvisitors av, leads l where v.id = av.visitor "
+                     "and l.appended_visitor_id = av.id "
+                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
+
         leads = db_session.query(AppendedVisitor).from_statement(stmt).all()
+        sent_dealer = db_session.query('total_sent').from_statement(stmt2).all()
         campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
         visitor_count = len(visitors)
         lead_count = len(leads)
-        open_count = 0
+        open_count = sent_dealer[0][0]
 
     return render_template(
         'campaign_detail.html',
@@ -616,17 +620,27 @@ def reports():
     stores = db_session.query(Store).order_by('name').filter_by(status='ACTIVE').all()
     store_id = None
     store_name = None
-    campaigns = []
     results = None
     results_count = 0
-    start_date = None
-    end_date = None
-    report_type = None
     campaign_id = None
+    current_time = datetime.datetime.now()
+    ct_date_string = current_time.strftime('%Y-%m-%d')
+    yesterday = (current_time - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    start_date = datetime.datetime.strptime(yesterday + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+    end_date = datetime.datetime.strptime(ct_date_string + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
 
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate_on_submit():
 
         if 'get-store-campaigns' in request.form.keys():
+            if 'report_date_range' in request.form.keys():
+                campaign_dates = form.report_date_range.data.split('-')
+                r1_date = datetime.datetime.strptime(campaign_dates[0].strip(), '%m/%d/%Y')
+                r2_date = datetime.datetime.strptime(campaign_dates[1].strip(), '%m/%d/%Y')
+                s_date = r1_date.strftime('%Y-%m-%d')
+                e_date = r2_date.strftime('%Y-%m-%d')
+                start_date = datetime.datetime.strptime(s_date + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+                end_date = datetime.datetime.strptime(e_date + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+
             store_id = form.store_id.data
 
             store = db_session.query(Store).filter(
@@ -635,55 +649,44 @@ def reports():
 
             store_name = store.name
 
-            campaigns = db_session.query(Campaign).order_by(
-                Campaign.name.asc()).filter_by(
-                status='ACTIVE',
-                store_id=store_id
-            ).all()
+            # raw sql report query
+            stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
+                        "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
+                        "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id) as total_appends, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id) as total_leads, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_to_dealer = 1) as total_sent_to_dealer, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_adf = 1) as total_adf, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.followup_email = 1) as total_followups, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.rvm_sent = 1) as total_rvms, "
+                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.email_verified = 1) as total_email_verified "
+                        "from campaigns c, visitors v, stores s, appendedvisitors av, campaigntypes ct "
+                        "where c.id = v.campaign_id "
+                        "and c.store_id = s.id "
+                        "and c.type = ct.id "
+                        "and v.id = av.visitor "
+                        "and s.id = {} "
+                        "and c.status = 'ACTIVE' "
+                        "and (v.created_date between '{}' and '{}') "
+                        "GROUP BY c.job_number, c.id, c.name, ct.name  "
+                        "ORDER BY c.job_number".format(store_id, start_date, end_date))
 
-        elif 'run-report' in request.form.keys() and form.validate_on_submit():
-            campaign_id = form.campaign_id.data
-            report_type = form.report_type.data
-            campaign_dates = form.report_date_range.data.split('-')
-            start_date = datetime.datetime.strptime(campaign_dates[0].strip() + ' 12:00:00', '%m/%d/%Y %H:%M:%S')
-            end_date = datetime.datetime.strptime(campaign_dates[1].strip() + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
-            store_id = form.store_id.data
-
-            store = db_session.query(Store).filter(
-                Store.id == store_id
-            ).one()
-
-            store_name = store.name
-
-            if report_type == 'daily-recap':
-                # raw sql report query
-                stmt = text("select av.created_date, av.first_name, av.last_name, av.address1, av.address2, av.city, "
-                            "av.state, av.zip_code, av.zip_4, av.email, av.cell_phone, av.credit_range, av.car_year, "
-                            "av.car_make, av.car_model "
-                            "from visitors v, appendedvisitors av "
-                            "where v.id = av.visitor "
-                            "and v.campaign_id = {} "                            
-                            "and ( v.created_date between '{}' and '{}' ) "
-                            "order by av.last_name, av.first_name asc".format(campaign_id, start_date, end_date))
-
-                results = db_session.query('created_date', 'first_name', 'last_name', 'address1', 'address2',
-                                           'city', 'state', 'zip_code', 'zip_4', 'email', 'cell_phone', 'credit_range',
-                                           'car_year', 'car_make', 'car_model').from_statement(stmt).all()
-                if results:
-                    results_count = len(results)
+            results = db_session.query('job_number', 'id', 'name', 'campaign_type', 'total_visitors',
+                                       'total_appends', 'total_leads', 'total_sent_to_dealer', 'total_adf',
+                                       'total_followups', 'total_rvms',
+                                       'total_email_verified').from_statement(stmt).all()
+            if results:
+                results_count = len(results)
 
     return render_template(
         'reports.html',
         today=get_date(),
         form=form,
-        campaigns=campaigns,
         stores=stores,
         store_id=store_id,
         store_name=store_name,
         results=results,
         start_date=start_date,
         end_date=end_date,
-        report_type=report_type,
         campaign_id=campaign_id,
         results_count=results_count
     )
@@ -809,7 +812,7 @@ def flash_errors(form):
             ))
 
 
-def send_email(to, subject, **kwargs):
+def send_email(to, subject, msg_body, **kwargs):
     """
     Send Mail function
     :param to:
@@ -824,7 +827,7 @@ def send_email(to, subject, **kwargs):
         recipients=[to, ]
     )
     msg.body = "EARL Dealer Demo UI Test"
-    # msg.html = render_template(template + '.html', **kwargs)
+    msg.html = msg_body
     send_async_email.delay(msg)
 
 
@@ -839,11 +842,23 @@ def get_dashboard():
     campaigns = db_session.query(Campaign).count()
     active_stores = db_session.query(Store).filter_by(status='ACTIVE').count()
     active_campaigns = db_session.query(Campaign).filter_by(status='ACTIVE').count()
+    total_visitors = db_session.query(Visitor).count()
+    total_appends = db_session.query(AppendedVisitor).count()
+    total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=True).count()
+    total_followups = db_session.query(Lead).filter_by(followup_email=True, followup_email_status='SENT').count()
+    total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='SENT').count()
+    append_rate = (total_appends / total_visitors) * 100.0
 
     dashboard['stores'] = stores
     dashboard['campaigns'] = campaigns
     dashboard['active_stores'] = active_stores
     dashboard['active_campaigns'] = active_campaigns
+    dashboard['total_visitors'] = total_visitors
+    dashboard['total_appends'] = total_appends
+    dashboard['total_dealer'] = total_sent_to_dealer
+    dashboard['total_followups'] = total_followups
+    dashboard['total_rvms'] = total_rvms
+    dashboard['append_rate'] = append_rate
 
     return dashboard
 
