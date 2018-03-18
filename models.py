@@ -129,7 +129,7 @@ class AppendedVisitor(Base):
     credit_range = Column(String(50))
     car_year = Column(Integer)
     car_make = Column(String(255))
-    car_Base = Column(String(255))
+    car_model = Column(String(255))
     processed = Column(Boolean, default=False)
 
     def __repr__(self):
