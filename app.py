@@ -653,22 +653,22 @@ def reports():
             stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
                         "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
                         "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id) as total_appends, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and v3.campaign_id = c4.id) as total_leads, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_to_dealer = 1 and v3.campaign_id = c4.id) as total_sent_to_dealer, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.sent_adf = 1 and v3.campaign_id = c4.id) as total_adf, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.followup_email = 1 and v3.campaign_id = c4.id) as total_followups, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.rvm_sent = 1 and v3.campaign_id = c4.id) as total_rvms, "
-                        "(select count(l.id) from leads l, appendedvisitors av2, visitors v3, campaigns c4 where l.appended_visitor_id = av2.id and av2.visitor = v3.id and l.email_verified = 1 and v3.campaign_id = c4.id) as total_email_verified "
+                        "(select count(l2.id) from appendedvisitors av2, visitors v3, leads l2 where v3.campaign_id = c.id and av2.visitor = v3.id and l2.appended_visitor_id = av2.id) as total_leads, "
+                        "(select count(l3.id) from appendedvisitors av2, visitors v3, leads l3 where v3.campaign_id = c.id and av2.visitor = v3.id and l3.appended_visitor_id = av2.id and l3.sent_to_dealer = 1) as total_sent_to_dealer, "
+                        "(select count(l4.id) from appendedvisitors av2, visitors v3, leads l4 where v3.campaign_id = c.id and av2.visitor = v3.id and l4.appended_visitor_id = av2.id and l4.sent_adf = 1) as total_adf, "
+                        "(select count(l5.id) from appendedvisitors av2, visitors v3, leads l5 where v3.campaign_id = c.id and av2.visitor = v3.id and l5.appended_visitor_id = av2.id and l5.followup_email = 1) as total_followups, "
+                        "(select count(l6.id) from appendedvisitors av2, visitors v3, leads l6 where v3.campaign_id = c.id and av2.visitor = v3.id and l6.appended_visitor_id = av2.id and l6.rvm_sent = 1) as total_rvms, "
+                        "(select count(l7.id) from appendedvisitors av2, visitors v3, leads l7 where v3.campaign_id = c.id and av2.visitor = v3.id and l7.appended_visitor_id = av2.id and l7.email_verified = 1) as total_email_verified "
                         "from campaigns c, visitors v, stores s, appendedvisitors av, campaigntypes ct "
                         "where c.id = v.campaign_id "
                         "and c.store_id = s.id "
-                        "and c.type = ct.id "
                         "and v.id = av.visitor "
                         "and s.id = {} "
                         "and c.status = 'ACTIVE' "
+                        "and c.type = ct.id "
                         "and (v.created_date between '{}' and '{}') "
-                        "GROUP BY c.job_number, c.id, c.name, ct.name  "
-                        "ORDER BY c.job_number".format(store_id, start_date, end_date))
+                        "GROUP BY c.job_number, c.id, c.name, ct.name "
+                        "order by c.job_number asc".format(store_id, start_date, end_date))
 
             results = db_session.query('job_number', 'id', 'name', 'campaign_type', 'total_visitors',
                                        'total_appends', 'total_leads', 'total_sent_to_dealer', 'total_adf',
