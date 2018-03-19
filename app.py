@@ -621,13 +621,14 @@ def reports():
     store_id = None
     store_name = None
     results = None
+    results_list = []
     results_count = 0
     campaign_id = None
     current_time = datetime.datetime.now()
     ct_date_string = current_time.strftime('%Y-%m-%d')
     yesterday = (current_time - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
     start_date = datetime.datetime.strptime(yesterday + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
-    end_date = datetime.datetime.strptime(ct_date_string + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+    end_date = datetime.datetime.strptime(yesterday + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
 
     if request.method == 'POST' and form.validate_on_submit():
 
@@ -641,41 +642,54 @@ def reports():
                 start_date = datetime.datetime.strptime(s_date + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
                 end_date = datetime.datetime.strptime(e_date + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
 
+            # set the store details and ID
             store_id = form.store_id.data
-
             store = db_session.query(Store).filter(
                 Store.id == store_id
             ).one()
-
             store_name = store.name
 
-            # raw sql report query
-            stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
-                        "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
-                        "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id) as total_appends, "
-                        "(select count(l2.id) from appendedvisitors av2, visitors v3, leads l2 where v3.campaign_id = c.id and av2.visitor = v3.id and l2.appended_visitor_id = av2.id) as total_leads, "
-                        "(select count(l3.id) from appendedvisitors av2, visitors v3, leads l3 where v3.campaign_id = c.id and av2.visitor = v3.id and l3.appended_visitor_id = av2.id and l3.sent_to_dealer = 1) as total_sent_to_dealer, "
-                        "(select count(l4.id) from appendedvisitors av2, visitors v3, leads l4 where v3.campaign_id = c.id and av2.visitor = v3.id and l4.appended_visitor_id = av2.id and l4.sent_adf = 1) as total_adf, "
-                        "(select count(l5.id) from appendedvisitors av2, visitors v3, leads l5 where v3.campaign_id = c.id and av2.visitor = v3.id and l5.appended_visitor_id = av2.id and l5.followup_email = 1) as total_followups, "
-                        "(select count(l6.id) from appendedvisitors av2, visitors v3, leads l6 where v3.campaign_id = c.id and av2.visitor = v3.id and l6.appended_visitor_id = av2.id and l6.rvm_sent = 1) as total_rvms, "
-                        "(select count(l7.id) from appendedvisitors av2, visitors v3, leads l7 where v3.campaign_id = c.id and av2.visitor = v3.id and l7.appended_visitor_id = av2.id and l7.email_verified = 1) as total_email_verified "
-                        "from campaigns c, visitors v, stores s, appendedvisitors av, campaigntypes ct "
-                        "where c.id = v.campaign_id "
-                        "and c.store_id = s.id "
-                        "and v.id = av.visitor "
-                        "and s.id = {} "
-                        "and c.status = 'ACTIVE' "
-                        "and c.type = ct.id "
-                        "and (v.created_date between '{}' and '{}') "
-                        "GROUP BY c.job_number, c.id, c.name, ct.name "
-                        "order by c.job_number asc".format(store_id, start_date, end_date))
+            # get the store active campaigns
+            campaign_list = db_session.query(Campaign).filter(
+                Campaign.store_id == store_id,
+                Campaign.status == 'ACTIVE'
+            ).all()
 
-            results = db_session.query('job_number', 'id', 'name', 'campaign_type', 'total_visitors',
-                                       'total_appends', 'total_leads', 'total_sent_to_dealer', 'total_adf',
-                                       'total_followups', 'total_rvms',
-                                       'total_email_verified').from_statement(stmt).all()
-            if results:
-                results_count = len(results)
+            if campaign_list:
+
+                for campaign in campaign_list:
+
+                    # raw sql report query
+                    stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
+                                "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
+                                "(select count(v1.id) from visitors v1 where v1.campaign_id = c.id) as total_unique_visitors, "
+                                "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id) as total_appends, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id) as total_leads, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.sent_to_dealer = 1) as total_sent_to_dealer, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.sent_adf = 1) as total_adfs, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.followup_email = 1) as total_followup_emails, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.rvm_sent = 1) as total_rvms, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.email_verified = 1) as total_email_verified "
+                                "from campaigns c, visitors v, stores s, appendedvisitors av, leads l, campaigntypes ct "
+                                "where c.id = v.campaign_id "
+                                "and c.store_id = s.id "
+                                "and v.id = av.visitor "
+                                "and l.appended_visitor_id = av.id "
+                                "and s.id = {} "
+                                "and c.id = {} "
+                                "and c.status = 'ACTIVE' "
+                                "and c.type = ct.id "
+                                "and (v.created_date between '{}' and '{}') "
+                                "GROUP BY c.job_number, c.id, c.name, ct.name "
+                                "order by c.job_number asc".format(store_id, campaign.id, start_date, end_date))
+
+                    results = db_session.query('job_number', 'id', 'name', 'campaign_type', 'total_visitors',
+                                               'total_unique_visitors', 'total_appends', 'total_leads',
+                                               'total_sent_to_dealer', 'total_adfs', 'total_followup_emails',
+                                               'total_rvms', 'total_email_verified').from_statement(stmt).all()
+                    if results:
+                        results_list.append(results)
+                        results_count = len(results_list)
 
     return render_template(
         'reports.html',
@@ -684,7 +698,7 @@ def reports():
         stores=stores,
         store_id=store_id,
         store_name=store_name,
-        results=results,
+        results_list=results_list,
         start_date=start_date,
         end_date=end_date,
         campaign_id=campaign_id,

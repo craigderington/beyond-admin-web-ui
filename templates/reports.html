@@ -59,7 +59,7 @@
     </div>
 
 
-    {% if results %}
+    {% if results_list %}
 
         <div class="well with-header">
             <div class="header bordered-azure"><i class="fa fa-bar-chart"></i> <strong>Report Results</strong></div>
@@ -81,6 +81,7 @@
                             <th>Name</th>
                             <th>Tactic</th>
                             <th>Total Vistors</th>
+                            <th>Total Unique Visitors</th>
                             <th>Total Appends</th>
                             <th>Total Leads</th>
                             <th>Total Sent to Dealer</th>
@@ -92,27 +93,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for result in results %}
-                        <tr>
-                            <td>{{ result.job_number }}</td>
-                            <td>{{ result.id }}</td>
-                            <td>{{ result.name }}</td>
-                            <td>{{ result.campaign_type }}</td>
-                            <td>{{ result.total_visitors }}</td>
-                            <td>{{ result.total_appends }}</td>
-                            <td>{{ result.total_leads }}</td>
-                            <td>{{ result.total_sent_to_dealer }}</td>
-                            <td>{{ result.total_adf }}</td>
-                            <td>{{ result.total_followups }}</td>
-                            <td>{{ result.total_rvms}}</td>
-                            <td>{{ result.total_email_verified }}</td>
-                            <td><a href="#" class="btn btn-xs btn-primary">
-                                    <i class="fa fa-download"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        {% for result in results_list %}
+                            <tr>
+                                <td>{{ result[0][0] }}</td>
+                                <td>{{ result[0][1] }}</td>
+                                <td>{{ result[0][2] }}</td>
+                                <td>{{ result[0][3] }}</td>
+                                <td>{{ result[0][4] }}</td>
+                                <td>{{ result[0][5] }}</td>
+                                <td>{{ result[0][6] }}</td>
+                                <td>{{ result[0][7] }}</td>
+                                <td>{{ result[0][8] }}</td>
+                                <td>{{ result[0][9] }}</td>
+                                <td>{{ result[0][10] }}</td>
+                                <td>{{ result[0][11] }}</td>
+                                <td>{{ result[0][12] }}</td>
+                                <td><a href="#" class="btn btn-xs btn-primary">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="14"><span class="badge badge-success badge-square"> {{ results_count }} active campaigns.</span></td>
+                        </tr>
+                    </tfoot>
                 </table>
         </div>
 
@@ -120,7 +127,7 @@
     {% endif %}
 
     {% if store_id %}
-        {% if not results %}
+        {% if not results_list %}
             <div class="alert alert-block alert-danger">
                 <h4><i class="fa fa-warning"></i> <strong>NO RESULTS FOUND!</strong></h4>
                 <p>There are no results for the selected dates: {{ start_date|datemdy }} and {{ end_date|datemdy }}</p>
