@@ -661,15 +661,15 @@ def reports():
 
                     # raw sql report query
                     stmt = text("select c.job_number, c.id, c.name, ct.name as campaign_type, "
-                                "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id) as total_visitors, "
-                                "(select count(v1.id) from visitors v1 where v1.campaign_id = c.id) as total_unique_visitors, "
-                                "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id) as total_appends, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id) as total_leads, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.sent_to_dealer = 1) as total_sent_to_dealer, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.sent_adf = 1) as total_adfs, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.followup_email = 1) as total_followup_emails, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.rvm_sent = 1) as total_rvms, "
-                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and l2.email_verified = 1) as total_email_verified "
+                                "(select sum(v1.num_visits) from visitors v1 where v1.campaign_id = c.id and v1.created_date between '{}' and '{}') as total_visitors, "
+                                "(select count(v1.id) from visitors v1 where v1.campaign_id = c.id and v1.created_date between '{}' and '{}') as total_unique_visitors, "
+                                "(select count(av1.id) from appendedvisitors av1, visitors v2 where av1.visitor = v2.id and v2.campaign_id = c.id and v2.created_date between '{}' and '{}') as total_appends, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}') as total_leads, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}' and l2.sent_to_dealer = 1) as total_sent_to_dealer, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}' and l2.sent_adf = 1) as total_adfs, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}' and l2.followup_email = 1) as total_followup_emails, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}' and l2.rvm_sent = 1) as total_rvms, "
+                                "(select count(l2.id) from leads l2, appendedvisitors av3, visitors v3 where l2.appended_visitor_id = av3.id and av3.visitor = v3.id and v3.campaign_id = c.id and v3.created_date between '{}' and '{}' and l2.email_verified = 1) as total_email_verified "
                                 "from campaigns c, visitors v, stores s, appendedvisitors av, leads l, campaigntypes ct "
                                 "where c.id = v.campaign_id "
                                 "and c.store_id = s.id "
@@ -681,7 +681,13 @@ def reports():
                                 "and c.type = ct.id "
                                 "and (v.created_date between '{}' and '{}') "
                                 "GROUP BY c.job_number, c.id, c.name, ct.name "
-                                "order by c.job_number asc".format(store_id, campaign.id, start_date, end_date))
+                                "order by c.job_number asc".format(start_date, end_date, start_date, end_date,
+                                                                   start_date, end_date, start_date, end_date,
+                                                                   start_date, end_date, start_date, end_date,
+                                                                   start_date, end_date, start_date, end_date,
+                                                                   start_date, end_date,
+                                                                   store_id, campaign.id,
+                                                                   start_date, end_date))
 
                     results = db_session.query('job_number', 'id', 'name', 'campaign_type', 'total_visitors',
                                                'total_unique_visitors', 'total_appends', 'total_leads',
