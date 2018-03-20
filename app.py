@@ -864,8 +864,8 @@ def get_dashboard():
     active_campaigns = db_session.query(Campaign).filter_by(status='ACTIVE').count()
     total_visitors = db_session.query(Visitor).count()
     total_appends = db_session.query(AppendedVisitor).count()
-    total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=True).count()
-    total_followups = db_session.query(Lead).filter_by(followup_email_status='SENT').count()
+    total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=1).count()
+    total_followups = db_session.query(Lead).filter_by(followup_email=True).count()
     total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='SENT').count()
     append_rate = (total_appends / total_visitors) * 100.0
 
