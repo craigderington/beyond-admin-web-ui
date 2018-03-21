@@ -1,6 +1,7 @@
 from flask import Flask, make_response, redirect, request, Response, render_template, url_for, flash, g
 from flask_mail import Mail, Message
 from flask_sslify import SSLify
+from flask_session import Session
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc, func
@@ -16,17 +17,25 @@ import hashlib
 import pymongo
 import phonenumbers
 import time
+import redis
 
 
 # debug
-debug = False
-
-# app settings
-app = Flask(__name__)
-sslify = SSLify(app)
+debug = True
 
 # app config
+app = Flask(__name__)
+sslify = SSLify(app)
 app.secret_key = config.SECRET_KEY
+
+# session persistence
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis.from_url('172.26.7.220:6379')
+app.config['SESSION_PERMANENT'] = True
+sess = Session()
+sess.init_app(app)
+
+# mongo config
 app.config['MONGO_SERVER'] = config.MONGO_SERVER
 app.config['MONGO_DB'] = config.MONGO_DB
 
