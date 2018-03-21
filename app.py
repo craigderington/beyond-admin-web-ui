@@ -21,7 +21,7 @@ import redis
 
 
 # debug
-debug = True
+debug = False
 
 # app config
 app = Flask(__name__)
