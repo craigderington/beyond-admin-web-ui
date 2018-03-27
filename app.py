@@ -393,9 +393,10 @@ def campaign_detail(campaign_pk_id):
             campaign.client_id = form.client_id.data
             campaign.radius = form.radius.data
             campaign.start_date = form.start_date.data
-            campaign.end_data = form.end_date
+            campaign.end_date = form.end_date.data
             campaign.name = form.name.data
             campaign.status = form.status.data
+            campaign.adf_subject = form.adf_subject.data
 
             # commit to the database
             db_session.commit()
@@ -451,11 +452,6 @@ def campaign_detail(campaign_pk_id):
 
     if campaign:
 
-        visitors = db_session.query(Visitor).filter(and_(
-            Visitor.job_number == campaign.job_number,
-            Visitor.campaign_id == campaign.id
-        )).all()
-
         store = db_session.query(Store).filter(
             Store.id == campaign.store_id
         ).one()
@@ -463,7 +459,7 @@ def campaign_detail(campaign_pk_id):
         if campaign.pixeltrackers_id:
             pt = db_session.query(PixelTracker).get(campaign.pixeltrackers_id)
 
-        stmt = text("SELECT v.id, av.* from visitors v, appendedvisitors av where v.id = av.visitor "
+        stmt = text("SELECT count(av.id) as total_appends from visitors v, appendedvisitors av where v.id = av.visitor "
                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
 
         stmt2 = text("SELECT count(l.id) as total_sent "
@@ -471,18 +467,33 @@ def campaign_detail(campaign_pk_id):
                      "and l.appended_visitor_id = av.id "
                      "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
 
-        leads = db_session.query(AppendedVisitor).from_statement(stmt).all()
+        stmt3 = text("SELECT sum(num_visits) as total_visitors from visitors v, campaigns c "
+                     "where v.campaign_id = c.id and v.campaign_id={}".format(campaign.id))
+
+        stmt35 = text("SELECT count(v.id) as total_unique_visitors from visitors v, campaigns c "
+                      "where v.campaign_id = c.id and v.campaign_id={}".format(campaign.id))
+
+        stmt4 = text("SELECT count(l.id) as total_followups "
+                     "from visitors v, appendedvisitors av, leads l where v.id = av.visitor "
+                     "and l.appended_visitor_id = av.id "
+                     "and v.store_id={} and v.campaign_id={} "
+                     "and l.sent_to_dealer=1".format(campaign.store_id, campaign.id))
+
+        total_appends = db_session.query('total_appends').from_statement(stmt).all()
         sent_dealer = db_session.query('total_sent').from_statement(stmt2).all()
+        total_visitors = db_session.query('total_visitors').from_statement(stmt3).all()
+        total_unique_visitors = db_session.query('total_unique_visitors').from_statement(stmt35).all()
+        total_followups = db_session.query('total_followups').from_statement(stmt4).all()
         campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
-        visitor_count = len(visitors)
-        lead_count = len(leads)
-        open_count = sent_dealer[0][0]
+        sent_to_dealer_count = sent_dealer[0][0]
+        total_appended_count = total_appends[0][0]
+        total_visitor_count = total_visitors[0][0]
+        total_followup_count = total_followups[0][0]
+        total_unique_visitor_count = total_unique_visitors[0][0]
 
     return render_template(
         'campaign_detail.html',
         campaign=campaign,
-        visitors=visitors[0:100],
-        leads=leads,
         today=get_date(),
         form=form,
         approval_form=approval_form,
@@ -491,9 +502,13 @@ def campaign_detail(campaign_pk_id):
         store=store,
         campaign_pixelhash=campaign_pixelhash.strip()[-10:],
         pt=pt,
-        visitor_count=visitor_count,
-        lead_count=lead_count,
-        open_count=open_count
+        sent_to_dealer_count=sent_to_dealer_count,
+        total_appended_count=total_appended_count,
+        total_visitor_count=total_visitor_count,
+        total_followup_count=total_followup_count,
+        total_unique_visitors=total_unique_visitor_count,
+        total_appends=total_appends
+
     )
 
 

@@ -16,8 +16,8 @@
             <div class="col-lg-1 col-md-2 col-sm-6 text-center">
                 <i class="fa fa-address-card fa-5x icon-only" style="margin-top: 35px;"></i>
             </div>
-            <div class="col-lg-7 col-md-8 col-sm-12 profile-info">
-                <div class="header-fullname"><h1>{{ campaign.name }}<br/>{{ campaign.campaign_type }}</h1></div>
+            <div class="col-lg-11 col-md-4 col-sm-12 profile-info">
+                <div class="header-fullname"><h1>{{ campaign.name }}</h1></div>
                 {% if campaign.status == 'ACTIVE' %}
                     <a href="#" class="btn btn-success btn-md btn-follow">
                         <i class="fa fa-check"></i> {{ campaign.status.upper() }}
@@ -28,37 +28,7 @@
                     </a>
                 {% endif %}
                 <div class="header-description">
-
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 profile-stats">
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value primary">{{ visitor_count }}</div>
-                        <div class="stats-title">VISITORS</div>
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value darkorange">{{ lead_count }}</div>
-                        <div class="stats-title">LEADS</div>
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 stats-col">
-                        <div class="stats-value azure">{{ open_count }}</div>
-                        <div class="stats-title">SENT TO DEALER</div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
-                        <i class="fa fa-info-circle"></i>
-                        <a href="{{ url_for('store_detail', store_pk_id=store.id) }}">
-                            {{ store.name }}
-                        </a>
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
-                        <i class="fa fa-map"></i> {{ store.city}}, {{ store.state.upper() }}
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 inlinestats-col">
-                        <i class="fa fa-map-marker"></i> Radius: {{ campaign.radius }}
-                    </div>
+                    {{ campaign.campaign_type }}
                 </div>
             </div>
         </div><!-- end: profile-header -->
@@ -93,14 +63,9 @@
                             Campaign RVM
                         </a>
                     </li>
-                    <li class="tab-default {% if active_tab == 'visitors' %}active{% endif %}">
-                        <a data-toggle="tab" href="#visitors">
-                            Visitors
-                        </a>
-                    </li>
-                    <li class="tab-success {% if active_tab == 'leads' %}active{% endif %}">
-                        <a data-toggle="tab" href="#leads">
-                            Leads
+                    <li class="tab-default {% if active_tab == 'stats' %}active{% endif %}">
+                        <a data-toggle="tab" href="#stats">
+                            Campaign Stats
                         </a>
                     </li>
                 </ul><!-- end: tabs -->
@@ -419,168 +384,102 @@
 
 
                     <!-- begin: visitors -->
-                    <div id="visitors" class="tab-pane">
+                    <div id="stats" class="tab-pane">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="widget">
-                                    <div class="widget-header bg-azure">
-                                        <i class="widget-icon fa fa-globe"></i>
-                                        <span class="widget-caption">Campaign Visitors</span>
-                                    </div>
-                                    <div class="widget-body">
-                                        <div style="padding: 7px;">
-                                            <form class="form-inline" method="post" id="search-visitors">
-                                                <div class="form-group">
-                                                    <span class="input-icon">
-                                                        <input type="text" name="q" class="form-control input-md" placeholder="Search Visitors">
-                                                        <i class="fa fa-search danger circular"></i>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number sky">
+                                                        <i class="fa fa-group fa-2x text-azure"></i>
                                                     </span>
                                                 </div>
-                                                <span class="pull-right">
-                                                    <div class="form-group">
-                                                        <label>Records Per Page</label>
-                                                        <select name="show_xrecords" class="form-control input-md">
-                                                            <option value="10">10</option>
-                                                            <option value="25">25</option>
-                                                            <option value="50">50</option>
-                                                            <option value="100">100</option>
-                                                        </select>
-                                                    </div>
-                                                </span>
-                                            </form>
+                                                <div class="databox-right bordered-thick bordered-sky bg-white">
+                                                    <span class="databox-number sky">{{ total_visitor_count }}</span>
+                                                    <div class="databox-text darkgray">TOTAL VISITORS</div>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        {% if not visitors %}
-
-                                            <div class="alert alert-warning fade in" style="margin-top: 25px;">
-                                                <button class="close" data-dismiss="alert">&times;</button>
-                                                    <i class="fa-fw fa fa-warning"></i>
-                                                        <strong>Warning</strong> This campaign has not yet received any visitors.  Please check back later.
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number primary">
+                                                        <i class="fa fa-check-circle-o fa-2x text-primary"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-primary bg-white">
+                                                    <span class="databox-number primary">{{ total_visitor_count }}</span>
+                                                    <div class="databox-text darkgray">TOTAL UNIQUE VISITORS</div>
+                                                </div>
                                             </div>
+                                        </div>
 
-                                        {% else %}
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number success">
+                                                        <i class="fa fa-th-list fa-2x text-success"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-success bg-white">
+                                                    <span class="databox-number success">{{ total_appended_count }}</span>
+                                                    <div class="databox-text darkgray">TOTAL APPENDED VISITORS</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number sky">
+                                                        <i class="fa fa-envelope-square fa-2x text-azure"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-sky bg-white">
+                                                    <span class="databox-number sky">{{ sent_to_dealer_count }}</span>
+                                                    <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                            <table class="table table-hover table-striped">
-                                                <thead class="bordered-primary">
-                                                    <tr>
-                                                        <th>Visitor IP</th>
-                                                        <th>Visitor Date</th>
-                                                        <th>Job Number</th>
-                                                        <th>Client ID</th>
-                                                        <th>Processed</th>
-                                                        <th>Country Code</th>
-                                                        <th>Region</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for visitor in visitors %}
-                                                    <tr>
-                                                        <td>{{ visitor.ip }}</td>
-                                                        <td>{{ visitor.created_date|formatdate }}</td>
-                                                        <td>{{ visitor.job_number }}</td>
-                                                        <td>{{ visitor.client_id }}</td>
-                                                        <td>{% if visitor.processed %}<span class="label label-success">True</span>{% else %}<span class="label label-danger">NOT PROCESSED</span>{% endif %}</td>
-                                                        <td>{{ visitor.country_code }}</td>
-                                                        <td>{{ visitor.region }}</td>
-                                                        <td>{{ visitor.status }}</td>
-                                                    </tr>
-                                                {% endfor %}
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <td><i class="fa fa-info-circle"></i> Showing Last 100 Visitors...</td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        {% endif %}
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number primary">
+                                                        <i class="fa fa-envelope-open-o fa-2x text-dark"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-primary bg-white">
+                                                    <span class="databox-number primary">{{ total_followup_count }}</span>
+                                                    <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number success">
+                                                        <i class="fa fa-mobile fa-2x text-success"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-success bg-white">
+                                                    <span class="databox-number success">0</span>
+                                                    <div class="databox-text darkgray">TOTAL RVMS SENT</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div><!-- end: visitors -->
 
-                    <!-- begin: leads -->
-                    <div id="leads" class="tab-pane">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="widget">
-                                    <div class="widget-header bg-success">
-                                        <i class="widget-icon fa fa-address-card-o"></i>
-                                        <span class="widget-caption">Campaign Leads</span>
-                                    </div>
-                                    <div class="widget-body">
-                                        <div style="padding: 7px;">
-                                            <form class="form-inline" method="post" id="search-leads">
-                                                <div class="form-group">
-                                                    <span class="input-icon">
-                                                        <input type="text" name="q" class="form-control input-md" placeholder="Search Leads">
-                                                        <i class="fa fa-search danger circular"></i>
-                                                    </span>
-                                                </div>
-                                                <span class="pull-right">
-                                                    <div class="form-group">
-                                                        <label>Records Per Page</label>
-                                                        <select name="show_xrecords" class="form-control input-md">
-                                                            <option value="10">10</option>
-                                                            <option value="25">25</option>
-                                                            <option value="50">50</option>
-                                                            <option value="100">100</option>
-                                                        </select>
-                                                    </div>
-                                                </span>
-                                            </form>
-                                        </div>
 
-                                        {% if not leads %}
-
-                                            <div class="alert alert-warning fade in" style="margin-top: 25px;">
-                                                <button class="close" data-dismiss="alert">&times;</button>
-                                                    <i class="fa-fw fa fa-warning"></i>
-                                                        <strong>Warning</strong> This campaign has not yet converted visitors into leads.  Please check back later.
-                                            </div>
-
-                                        {% else %}
-
-                                            <table class="table table-hover table-striped">
-                                                <thead class="bordered-primary">
-                                                    <tr>
-                                                        <th>Lead Name</th>
-                                                        <th>Created Date</th>
-                                                        <th>Email</th>
-                                                        <th>Address</th>
-                                                        <th>City, State, Zip</th>
-                                                        <th>Phone</th>
-                                                        <th>Auto Info</th>
-                                                        <th>Processed</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for lead in leads %}
-                                                    <tr>
-                                                        <td>{{ lead.first_name }} {{ lead.last_name }}</td>
-                                                        <td>{{ lead.created_date|formatdate }}</td>
-                                                        <td>{{ lead.email }}</td>
-                                                        <td>{{ lead.address1 }}</td>
-                                                        <td>{{ lead.city }}  {{ lead.state }} {{ lead.zip_code }}</td>
-                                                        <td>{{ lead.home_phone }} {{ lead.cell_phone }}</td>
-                                                        <td>{{ lead.car_year }} {{ lead.car_make }} {{ lead.car_model }}</td>
-                                                        <td>{% if lead.processed %}<span class="label label-success">True</span>{% else %}<span class="label label-danger">NOT PROCESSED</span>{% endif %}</td>
-                                                    </tr>
-                                                {% endfor %}
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <td><i class="fa fa-info-circle"></i> Showing Last 100 Leads...</td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!-- end: leads -->
 
                     <!-- begin: settings -->
                     <div id="settings" class="tab-pane {% if 'settings' in request.full_path %}active{% elif '?=' not in request.full_path %}active{% endif %}">
