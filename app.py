@@ -506,7 +506,7 @@ def campaign_detail(campaign_pk_id):
         total_appended_count=total_appended_count,
         total_visitor_count=total_visitor_count,
         total_followup_count=total_followup_count,
-        total_unique_visitors=total_unique_visitor_count,
+        total_unique_visitor_count=total_unique_visitor_count,
         total_appends=total_appends
 
     )
