@@ -890,7 +890,7 @@ def get_dashboard():
     total_appends = db_session.query(AppendedVisitor).count()
     total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=1).count()
     total_followups = db_session.query(Lead).filter_by(followup_email=True).count()
-    total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='SENT').count()
+    total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='LOADED').count()
     append_rate = (total_appends / total_visitors) * 100.0
 
     dashboard['stores'] = stores
