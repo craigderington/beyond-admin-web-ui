@@ -68,12 +68,12 @@
         <div class="databox databox-lg radius-bordered databox-shadowed">
             <div class="databox-left bg-white">
                 <span class="databox-number sky">
-                    <i class="fa fa-users fa-2x text-sky"></i>
+                    <i class="fa fa-globe fa-2x text-sky"></i>
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
                 <span class="databox-number sky">{{ dashboard.total_visitors }}</span>
-                <div class="databox-text darkgray">TOTAL VISITORS</div>
+                <div class="databox-text darkgray">TOTAL GLOBAL VISITORS</div>
             </div>
         </div>
     </div>
@@ -82,12 +82,12 @@
         <div class="databox databox-lg radius-bordered databox-shadowed">
             <div class="databox-left bg-white">
                 <span class="databox-number primary">
-                    <i class="fa fa-check-square-o fa-2x text-primary"></i>
+                    <i class="fa fa-user-circle-o fa-2x text-primary"></i>
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-primary bg-white">
-                <span class="databox-number primary">{{ dashboard.total_appends }}</span>
-                <div class="databox-text darkgray">TOTAL APPENDS</div>
+                <span class="databox-number primary">{{ dashboard.total_unique_visitors }}</span>
+                <div class="databox-text darkgray">TOTAL UNIQUE VISITORS</div>
             </div>
         </div>
     </div>
@@ -96,12 +96,26 @@
         <div class="databox databox-lg radius-bordered databox-shadowed">
             <div class="databox-left bg-white">
                 <span class="databox-number success">
-                    <i class="fa fa-percent fa-2x text-success"></i>
+                    <i class="fa fa-id-badge fa-2x text-success"></i>
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-success bg-white">
-                <span class="databox-number success">{{ '%0.2f'|format(dashboard.append_rate|float) }} %</span>
-                <div class="databox-text darkgray">APPEND RATE</div>
+                <span class="databox-number success">{{ dashboard.total_us_visitors }}</span>
+                <div class="databox-text success">TOTAL U.S. VISITORS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number darkorange">
+                    <i class="fa fa-check-square-o fa-2x text-darkorange"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-darkorange bg-white">
+                <span class="databox-number darkorange">{{ dashboard.total_appends }}</span>
+                <div class="databox-text darkgray">TOTAL APPENDS</div>
             </div>
         </div>
     </div>
@@ -151,7 +165,50 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number sky">
+                    <i class="fa fa-percent fa-2x text-sky"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-sky bg-white">
+                <span class="databox-number sky">{{ '%0.2f'|format(dashboard.global_append_rate|float) }} %</span>
+                <div class="databox-text darkgray">GLOBAL VISITORS APPEND RATE</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number primary">
+                    <i class="fa fa-percent fa-2x text-primary"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-primary bg-white">
+                <span class="databox-number primary">{{ '%0.2f'|format(dashboard.unique_append_rate|float) }} %</span>
+                <div class="databox-text darkgray">UNIQUE VISITORS APPEND RATE</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed">
+            <div class="databox-left bg-white">
+                <span class="databox-number success">
+                    <i class="fa fa-percent fa-2x text-success"></i>
+                </span>
+            </div>
+            <div class="databox-right bordered-thick bordered-success bg-white">
+                <span class="databox-number success">{{ '%0.2f'|format(dashboard.us_append_rate|float) }} %</span>
+                <div class="databox-text darkgray">U.S. VISITORS APPEND RATE</div>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 <div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">

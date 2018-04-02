@@ -886,23 +886,34 @@ def get_dashboard():
     campaigns = db_session.query(Campaign).count()
     active_stores = db_session.query(Store).filter_by(status='ACTIVE').count()
     active_campaigns = db_session.query(Campaign).filter_by(status='ACTIVE').count()
-    total_visitors = db_session.query(Visitor).count()
+    visitors = db_session.query(func.sum(Visitor.num_visits).label('total_visitors')).one()
+    total_unique_visitors = db_session.query(Visitor).count()
+    total_us_visitors = db_session.query(Visitor).filter_by(country_code='US').count()
     total_appends = db_session.query(AppendedVisitor).count()
     total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=1).count()
     total_followups = db_session.query(Lead).filter_by(followup_email=True).count()
     total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='LOADED').count()
-    append_rate = (total_appends / total_visitors) * 100.0
+
+    # calc the append rates
+    total_visitors = int(visitors.total_visitors)
+    global_append_rate = (total_appends / total_visitors) * 100.0
+    unique_append_rate = (total_appends / total_unique_visitors) * 100.0
+    us_append_rate = (total_appends / total_us_visitors) * 100.0
 
     dashboard['stores'] = stores
     dashboard['campaigns'] = campaigns
     dashboard['active_stores'] = active_stores
     dashboard['active_campaigns'] = active_campaigns
     dashboard['total_visitors'] = total_visitors
+    dashboard['total_unique_visitors'] = total_unique_visitors
+    dashboard['total_us_visitors'] = total_us_visitors
     dashboard['total_appends'] = total_appends
     dashboard['total_dealer'] = total_sent_to_dealer
     dashboard['total_followups'] = total_followups
     dashboard['total_rvms'] = total_rvms
-    dashboard['append_rate'] = append_rate
+    dashboard['unique_append_rate'] = unique_append_rate
+    dashboard['global_append_rate'] = global_append_rate
+    dashboard['us_append_rate'] = us_append_rate
 
     return dashboard
 
