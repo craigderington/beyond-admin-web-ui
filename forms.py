@@ -30,7 +30,7 @@ class AddCampaignForm(FlaskForm):
     campaign_type = IntegerField('Campaign Type ID:', validators=[DataRequired()])
     start_date = DateField('Start Date:', format='%m/%d/%Y', validators=[DataRequired()])
     end_date = DateField('End Date:', format='%m/%d/%Y', validators=[DataRequired()])
-    radius = IntegerField('Campaign Radius:', validators=[DataRequired()])
+    radius = IntegerField('Campaign Radius:', validators=[InputRequired(), NumberRange(0, 100)])
     store_id = IntegerField('Store ID:', validators=[DataRequired()])
     status = StringField('Status:', validators=[DataRequired()])
     adf_subject = StringField('ADF Email Subject:')
