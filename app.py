@@ -150,6 +150,31 @@ def index():
     )
 
 
+@app.route('/dashboard/history', methods=['GET'])
+def dashboard_history():
+    """
+    Show the dashboard historical data
+    :return: queryset
+    """
+    dashboards = None
+    dashboard_count = 0
+
+    try:
+        dashboards = db_session.query(GlobalDashboard).order_by(GlobalDashboard.id.desc()).limit(100)
+        dashboard_count = dashboards.count()
+
+    except exc.SQLAlchemyError as err:
+        flash('The dashboard history view returned a database error: {}'.format(str(err)), category='danger')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'dashboard_history.html',
+        today=get_date(),
+        dashboards=dashboards,
+        dashboard_count=dashboard_count
+    )
+
+
 @app.route('/stores', methods=['GET'])
 @login_required
 def stores():

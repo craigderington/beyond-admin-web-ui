@@ -1,0 +1,72 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Global Dashboard History{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li><a href="{{ url_for('dashboard_history') }}"> Dashboard History</a></li>
+<li>Showing last {{ dashboard_count }} historical dashboard records.</li>
+{% endblock %}
+
+{% block content %}
+
+    {% if dashboards %}
+
+        <div class="well with-header with-footer">
+            <div class="header bg-primary">
+                <i class="fa fa-dashboard"></i> <strong>Historcial Dashboard Records</strong>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="bordered-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Stores</th>
+                        <th>Campaigns</th>
+                        <th>Global Visitors</th>
+                        <th>Unique Visitors</th>
+                        <th>U.S. Visitors</th>
+                        <th>Appends</th>
+                        <th>RTNs</th>
+                        <th>Emails</th>
+                        <th>RVMs</th>
+                        <th>Global Append Rate</th>
+                        <th>Unqiue Append Rate</th>
+                        <th>U.S. Append Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dashboard in dashboards %}
+                        <tr>
+                            <td>{{ dashboard.id }}</td>
+                            <td>{{ dashboard.last_update }}</td>
+                            <td>{{ dashboard.total_stores}} / {{ dashboard.active_stores }}</td>
+                            <td>{{ dashboard.total_campaigns }} / {{ dashboard.active_campaigns }}</td>
+                            <td>{{ dashboard.total_global_visitors }}</td>
+                            <td>{{ dashboard.total_unique_visitors }}</td>
+                            <td>{{ dashboard.total_us_visitors }}</td>
+                            <td>{{ dashboard.total_appends }}</td>
+                            <td>{{ dashboard.total_sent_to_dealer }}</td>
+                            <td>{{ dashboard.total_sent_followup_emails }}</td>
+                            <td>{{ dashboard.total_rvms_sent }}</td>
+                            <td>{{ dashboard.global_append_rate }} %</td>
+                            <td>{{ dashboard.unique_append_rate }} %</td>
+                            <td>{{ dashboard.us_append_rate }} %</td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="footer">
+                <span class="badge badge-success badge-square">{{ dashboard_count }}</span> active stores showing...
+            </div>
+        </div>
+
+
+    {% else %}
+
+        <h3>There are no records to display. </h3>
+
+    {% endif %}
+
+
+{% endblock %}

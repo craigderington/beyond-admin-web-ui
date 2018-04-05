@@ -3,6 +3,7 @@
 {% block breadcrumbs %}
 <li><a href="{{ url_for('index') }}">Dashboard</a></li>
 <li><strong><i class="fa fa-clock-o"></i> Dashboard Last Updated: {{ dashboard.last_update }}</strong></li>
+<li><a href="{{ url_for('dashboard_history') }}"><i class="fa fa-calendar-o"></i> View Dashboard History</a></li>
 {% endblock %}
 {% block content %}
 
