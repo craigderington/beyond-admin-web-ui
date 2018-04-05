@@ -7,7 +7,8 @@ from flask_sqlalchemy import SQLAlchemy, Pagination
 from sqlalchemy import text, and_, exc, func
 from database import db_session
 from celery import Celery
-from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact
+from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact, \
+    GlobalDashboard, StoreDashboard, CampaignDashboard
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
     ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm
 import config
@@ -204,6 +205,9 @@ def store_detail(store_pk_id):
     contact_form = ContactForm(request.form)
     storephonenumber = phonenumbers.parse(store.phone_number, 'US')
     store_phone = phonenumbers.format_number(storephonenumber, phonenumbers.PhoneNumberFormat.NATIONAL)
+    dashboard = db_session.query(StoreDashboard).filter(
+        StoreDashboard.store_id == store.id
+    ).order_by(StoreDashboard.id.desc()).limit(1).one()
 
     if request.method == 'POST':
 
@@ -267,7 +271,8 @@ def store_detail(store_pk_id):
         today=get_date(),
         form=form,
         contact_form=contact_form,
-        contact_count=contact_count
+        contact_count=contact_count,
+        dashboard=dashboard
     )
 
 
@@ -459,37 +464,11 @@ def campaign_detail(campaign_pk_id):
         if campaign.pixeltrackers_id:
             pt = db_session.query(PixelTracker).get(campaign.pixeltrackers_id)
 
-        stmt = text("SELECT count(av.id) as total_appends from visitors v, appendedvisitors av where v.id = av.visitor "
-                    "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
-
-        stmt2 = text("SELECT count(l.id) as total_sent "
-                     "from visitors v, appendedvisitors av, leads l where v.id = av.visitor "
-                     "and l.appended_visitor_id = av.id "
-                     "and v.store_id={} and v.campaign_id={}".format(campaign.store_id, campaign.id))
-
-        stmt3 = text("SELECT sum(num_visits) as total_visitors from visitors v, campaigns c "
-                     "where v.campaign_id = c.id and v.campaign_id={}".format(campaign.id))
-
-        stmt35 = text("SELECT count(v.id) as total_unique_visitors from visitors v, campaigns c "
-                      "where v.campaign_id = c.id and v.campaign_id={}".format(campaign.id))
-
-        stmt4 = text("SELECT count(l.id) as total_followups "
-                     "from visitors v, appendedvisitors av, leads l where v.id = av.visitor "
-                     "and l.appended_visitor_id = av.id "
-                     "and v.store_id={} and v.campaign_id={} "
-                     "and l.sent_to_dealer=1".format(campaign.store_id, campaign.id))
-
-        total_appends = db_session.query('total_appends').from_statement(stmt).all()
-        sent_dealer = db_session.query('total_sent').from_statement(stmt2).all()
-        total_visitors = db_session.query('total_visitors').from_statement(stmt3).all()
-        total_unique_visitors = db_session.query('total_unique_visitors').from_statement(stmt35).all()
-        total_followups = db_session.query('total_followups').from_statement(stmt4).all()
         campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
-        sent_to_dealer_count = sent_dealer[0][0]
-        total_appended_count = total_appends[0][0]
-        total_visitor_count = total_visitors[0][0]
-        total_followup_count = total_followups[0][0]
-        total_unique_visitor_count = total_unique_visitors[0][0]
+
+        dashboard = db_session.query(CampaignDashboard).filter(
+            CampaignDashboard.campaign_id == campaign.id
+        ).order_by(CampaignDashboard.id.desc()).one()
 
     return render_template(
         'campaign_detail.html',
@@ -502,13 +481,7 @@ def campaign_detail(campaign_pk_id):
         store=store,
         campaign_pixelhash=campaign_pixelhash.strip()[-10:],
         pt=pt,
-        sent_to_dealer_count=sent_to_dealer_count,
-        total_appended_count=total_appended_count,
-        total_visitor_count=total_visitor_count,
-        total_followup_count=total_followup_count,
-        total_unique_visitor_count=total_unique_visitor_count,
-        total_appends=total_appends
-
+        dashboard=dashboard
     )
 
 
@@ -880,41 +853,8 @@ def get_dashboard():
     Get the dashboard data
     :return: dict
     """
-
     dashboard = {}
-    stores = db_session.query(Store).count()
-    campaigns = db_session.query(Campaign).count()
-    active_stores = db_session.query(Store).filter_by(status='ACTIVE').count()
-    active_campaigns = db_session.query(Campaign).filter_by(status='ACTIVE').count()
-    visitors = db_session.query(func.sum(Visitor.num_visits).label('total_visitors')).one()
-    total_unique_visitors = db_session.query(Visitor).count()
-    total_us_visitors = db_session.query(Visitor).filter_by(country_code='US').count()
-    total_appends = db_session.query(AppendedVisitor).count()
-    total_sent_to_dealer = db_session.query(Lead).filter_by(sent_to_dealer=1).count()
-    total_followups = db_session.query(Lead).filter_by(followup_email=True).count()
-    total_rvms = db_session.query(Lead).filter_by(rvm_sent=True, rvm_status='LOADED').count()
-
-    # calc the append rates
-    total_visitors = int(visitors.total_visitors)
-    global_append_rate = (total_appends / total_visitors) * 100.0
-    unique_append_rate = (total_appends / total_unique_visitors) * 100.0
-    us_append_rate = (total_appends / total_us_visitors) * 100.0
-
-    dashboard['stores'] = stores
-    dashboard['campaigns'] = campaigns
-    dashboard['active_stores'] = active_stores
-    dashboard['active_campaigns'] = active_campaigns
-    dashboard['total_visitors'] = total_visitors
-    dashboard['total_unique_visitors'] = total_unique_visitors
-    dashboard['total_us_visitors'] = total_us_visitors
-    dashboard['total_appends'] = total_appends
-    dashboard['total_dealer'] = total_sent_to_dealer
-    dashboard['total_followups'] = total_followups
-    dashboard['total_rvms'] = total_rvms
-    dashboard['unique_append_rate'] = unique_append_rate
-    dashboard['global_append_rate'] = global_append_rate
-    dashboard['us_append_rate'] = us_append_rate
-
+    dashboard = db_session.query(GlobalDashboard).order_by(GlobalDashboard.id.desc()).limit(1).one()
     return dashboard
 
 

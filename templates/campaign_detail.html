@@ -383,7 +383,7 @@
 
 
 
-                    <!-- begin: visitors -->
+                    <!-- begin: campaign stats -->
                     <div id="stats" class="tab-pane">
                         <div class="row">
                             <div class="col-lg-12">
@@ -397,21 +397,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="databox-right bordered-thick bordered-sky bg-white">
-                                                    <span class="databox-number sky">{{ total_visitor_count }}</span>
-                                                    <div class="databox-text darkgray">TOTAL VISITORS</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-3 col-sm-6 col-xs-12">
-                                            <div class="databox databox-lg radius-bordered databox-shadowed">
-                                                <div class="databox-left bg-white">
-                                                    <span class="databox-number primary">
-                                                        <i class="fa fa-check-circle-o fa-2x text-primary"></i>
-                                                    </span>
-                                                </div>
-                                                <div class="databox-right bordered-thick bordered-primary bg-white">
-                                                    <span class="databox-number primary">{{ total_unique_visitor_count }}</span>
+                                                    <span class="databox-number sky">{{ dashboard.total_visitors }}</span>
                                                     <div class="databox-text darkgray">TOTAL UNIQUE VISITORS</div>
                                                 </div>
                                             </div>
@@ -425,8 +411,22 @@
                                                     </span>
                                                 </div>
                                                 <div class="databox-right bordered-thick bordered-success bg-white">
-                                                    <span class="databox-number success">{{ total_appended_count }}</span>
+                                                    <span class="databox-number success">{{ dashboard.total_appends }}</span>
                                                     <div class="databox-text darkgray">TOTAL APPENDED VISITORS</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-3 col-sm-6 col-xs-12">
+                                            <div class="databox databox-lg radius-bordered databox-shadowed">
+                                                <div class="databox-left bg-white">
+                                                    <span class="databox-number success">
+                                                        <i class="fa fa-th-list fa-2x text-success"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="databox-right bordered-thick bordered-success bg-white">
+                                                    <span class="databox-number success">{{ dashboard.append_rate }} %</span>
+                                                    <div class="databox-text darkgray">APPEND RATE</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -440,8 +440,8 @@
                                                     </span>
                                                 </div>
                                                 <div class="databox-right bordered-thick bordered-sky bg-white">
-                                                    <span class="databox-number sky">{{ sent_to_dealer_count }}</span>
-                                                    <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
+                                                    <span class="databox-number sky">{{ dashboard.total_rtns }}</span>
+                                                    <div class="databox-text darkgray">TOTAL NOTIFICATIONS SENT</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -454,8 +454,8 @@
                                                     </span>
                                                 </div>
                                                 <div class="databox-right bordered-thick bordered-primary bg-white">
-                                                    <span class="databox-number primary">{{ total_followup_count }}</span>
-                                                    <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
+                                                    <span class="databox-number primary">{{ dashboard.total_followup_emails }}</span>
+                                                    <div class="databox-text darkgray">TOTAL FOLLOWUP EMAILS SENT</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -468,7 +468,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="databox-right bordered-thick bordered-success bg-white">
-                                                    <span class="databox-number success">0</span>
+                                                    <span class="databox-number success">{{ dashboard.total_rvms }}</span>
                                                     <div class="databox-text darkgray">TOTAL RVMS SENT</div>
                                                 </div>
                                             </div>
@@ -477,7 +477,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div><!-- end: visitors -->
+                    </div><!-- end: campaign stats  -->
 
 
 

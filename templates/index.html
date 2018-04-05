@@ -2,6 +2,7 @@
 {% block title %}EARL Admin: Homepage{% endblock %}
 {% block breadcrumbs %}
 <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li><strong><i class="fa fa-clock-o"></i> Dashboard Last Updated: {{ dashboard.last_update }}</strong></li>
 {% endblock %}
 {% block content %}
 
@@ -14,7 +15,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
-                <span class="databox-number sky">{{ dashboard.stores }}</span>
+                <span class="databox-number sky">{{ dashboard.total_stores }}</span>
                 <div class="databox-text darkgray">TOTAL STORES</div>
             </div>
         </div>
@@ -42,7 +43,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-success bg-white">
-                <span class="databox-number success">{{ dashboard.campaigns }}</span>
+                <span class="databox-number success">{{ dashboard.total_campaigns }}</span>
                 <div class="databox-text darkgray">TOTAL CAMPAIGNS</div>
             </div>
         </div>
@@ -72,7 +73,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
-                <span class="databox-number sky">{{ dashboard.total_visitors }}</span>
+                <span class="databox-number sky">{{ dashboard.total_global_visitors }}</span>
                 <div class="databox-text darkgray">TOTAL GLOBAL VISITORS</div>
             </div>
         </div>
@@ -130,7 +131,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
-                <span class="databox-number sky">{{ dashboard.total_dealer }}</span>
+                <span class="databox-number sky">{{ dashboard.total_sent_to_dealer }}</span>
                 <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
             </div>
         </div>
@@ -144,7 +145,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-primary bg-white">
-                <span class="databox-number primary">{{ dashboard.total_followups }}</span>
+                <span class="databox-number primary">{{ dashboard.total_sent_followup_emails }}</span>
                 <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
             </div>
         </div>
@@ -158,7 +159,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-success bg-white">
-                <span class="databox-number success">{{ dashboard.total_rvms }}</span>
+                <span class="databox-number success">{{ dashboard.total_rvms_sent }}</span>
                 <div class="databox-text darkgray">TOTAL RVMS SENT</div>
             </div>
         </div>

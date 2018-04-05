@@ -59,17 +59,22 @@
                 <ul class="nav nav-tabs tabs-flat nav-justified" id="myTab11">
                     <li class="tab-azure active">
                         <a data-toggle="tab" href="#settings">
-                            Settings
+                            Store Settings
                         </a>
                     </li>
                     <li class="tab-success">
                         <a data-toggle="tab" href="#campaigns">
-                            Campaigns
+                            Store Campaigns
+                        </a>
+                    </li>
+                    <li class="tab-primary">
+                        <a data-toggle="tab" href="#stats">
+                            Store Campaign Statistics
                         </a>
                     </li>
                     <li class="tab-darkorange">
-                        <a data-toggle="tab" id="contacttab" href="#contacts">
-                            Contacts
+                        <a data-toggle="tab" href="#contacts">
+                            Store Contacts
                         </a>
                     </li>
                 </ul>
@@ -379,6 +384,200 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- store statistics -->
+                    <div id="stats" class="tab-pane">
+                        <div class="row">
+                            <div class="col-lg-12" style="margin-bottom:10px;">
+                                <strong><i class="fa fa-clock-o"></i> Store Dashboard Last Updated: {{ dashboard.last_update }}</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number success">
+                                            <i class="fa fa-th-list fa-2x text-success"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-success bg-white">
+                                        <span class="databox-number success">{{ dashboard.total_campaigns }}</span>
+                                        <div class="databox-text darkgray">TOTAL CAMPAIGNS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number darkorange">
+                                            <i class="fa fa-bar-chart fa-2x text-darkorange"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-darkorange bg-white">
+                                        <span class="databox-number darkorange">{{ dashboard.active_campaigns }}</span>
+                                        <div class="databox-text darkgray">ACTIVE CAMPAIGNS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number sky">
+                                            <i class="fa fa-globe fa-2x text-sky"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-sky bg-white">
+                                        <span class="databox-number sky">{{ dashboard.total_global_visitors }}</span>
+                                        <div class="databox-text darkgray">TOTAL GLOBAL VISITORS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number primary">
+                                            <i class="fa fa-user-circle-o fa-2x text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-primary bg-white">
+                                        <span class="databox-number primary">{{ dashboard.total_unique_visitors }}</span>
+                                        <div class="databox-text darkgray">TOTAL UNIQUE VISITORS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number success">
+                                            <i class="fa fa-id-badge fa-2x text-success"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-success bg-white">
+                                        <span class="databox-number success">{{ dashboard.total_us_visitors }}</span>
+                                        <div class="databox-text success">TOTAL U.S. VISITORS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number darkorange">
+                                            <i class="fa fa-check-square-o fa-2x text-darkorange"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-darkorange bg-white">
+                                        <span class="databox-number darkorange">{{ dashboard.total_appends }}</span>
+                                        <div class="databox-text darkgray">TOTAL APPENDS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number sky">
+                                            <i class="fa fa-envelope-square fa-2x text-sky"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-sky bg-white">
+                                        <span class="databox-number sky">{{ dashboard.total_sent_to_dealer }}</span>
+                                        <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number primary">
+                                            <i class="fa fa-envelope-open-o fa-2x text-dark"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-primary bg-white">
+                                        <span class="databox-number primary">{{ dashboard.total_sent_followup_emails }}</span>
+                                        <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number success">
+                                            <i class="fa fa-mobile fa-2x text-success"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-success bg-white">
+                                        <span class="databox-number success">{{ dashboard.total_rvms_sent }}</span>
+                                        <div class="databox-text darkgray">TOTAL RVMS SENT</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number sky">
+                                            <i class="fa fa-percent fa-2x text-sky"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-sky bg-white">
+                                        <span class="databox-number sky">{{ '%0.2f'|format(dashboard.global_append_rate|float) }} %</span>
+                                        <div class="databox-text darkgray">GLOBAL VISITORS APPEND RATE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number primary">
+                                            <i class="fa fa-percent fa-2x text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-primary bg-white">
+                                        <span class="databox-number primary">{{ '%0.2f'|format(dashboard.unique_append_rate|float) }} %</span>
+                                        <div class="databox-text darkgray">UNIQUE VISITORS APPEND RATE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-6 col-xs-12">
+                                <div class="databox databox-lg radius-bordered databox-shadowed">
+                                    <div class="databox-left bg-white">
+                                        <span class="databox-number success">
+                                            <i class="fa fa-percent fa-2x text-success"></i>
+                                        </span>
+                                    </div>
+                                    <div class="databox-right bordered-thick bordered-success bg-white">
+                                        <span class="databox-number success">{{ '%0.2f'|format(dashboard.us_append_rate|float) }} %</span>
+                                        <div class="databox-text darkgray">U.S. VISITORS APPEND RATE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- end: store statistics -->
+
+
+
+
+
+
                 </div><!-- end: tab-content -->
             </div><!-- end: tabbale -->
         </div><!-- end: profile body -->
