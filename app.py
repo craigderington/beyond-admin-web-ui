@@ -558,6 +558,21 @@ def campaign_add():
         # commit to the database
         db_session.add(campaign)
         db_session.commit()
+        db_session.flush()
+
+        # set the variables of the newly inserted campaign ID and store ID
+        campaign_id = campaign.id
+        store_id = campaign.store_id
+
+        # create a dashboard object so we don't break
+        # the campaign detail page
+        dashboard = CampaignDashboard(
+            store_id=store_id,
+            campaign_id=campaign_id
+        )
+
+        db_session.add(dashboard)
+        db_session.commit()
 
         # flash success message
         flash('Campaign {} created successfully...'.format(campaign.name), category='success')
