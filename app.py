@@ -499,7 +499,7 @@ def campaign_detail(campaign_pk_id):
             ).order_by(CampaignDashboard.id.desc()).limit(1).one()
 
         except exc.SQLAlchemyError as err:
-            flash('Database returned error: {}'.format(str(err)))
+            flash('Database returned error: {}'.format(str(err)), category='danger')
             return redirect(url_for('index'))
 
     return render_template(
