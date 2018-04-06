@@ -408,6 +408,7 @@ def campaign_detail(campaign_pk_id):
     open_count = 0
     pt = None
     store = None
+    dashboard = None
 
     # first, get our campaign
     campaign = db_session.query(Campaign).filter(
@@ -491,9 +492,15 @@ def campaign_detail(campaign_pk_id):
 
         campaign_pixelhash = hashlib.sha1(str(campaign.id).encode('utf-8')).hexdigest()
 
-        dashboard = db_session.query(CampaignDashboard).filter(
-            CampaignDashboard.campaign_id == campaign.id
-        ).order_by(CampaignDashboard.id.desc()).one()
+        try:
+            # get the campaign dashboard
+            dashboard = db_session.query(CampaignDashboard).filter(
+                CampaignDashboard.campaign_id == campaign.id
+            ).order_by(CampaignDashboard.id.desc()).limit(1).one()
+
+        except exc.SQLAlchemyError as err:
+            flash('Database returned error: {}'.format(str(err)))
+            return redirect(url_for('index'))
 
     return render_template(
         'campaign_detail.html',
