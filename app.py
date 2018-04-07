@@ -334,6 +334,32 @@ def store_add():
         # commit to the database
         db_session.add(new_store)
         db_session.commit()
+        db_session.flush()
+
+        # set the new vars
+        store_id = new_store.id
+
+        # create a dashboard object so we don't break the
+        # store detail view
+        dashboard = StoreDashboard(
+            store_id=store_id,
+            total_campaigns=0,
+            active_campaigns=0,
+            total_global_visitors=0,
+            total_unique_visitors=0,
+            total_us_visitors=0,
+            total_appends=0,
+            total_sent_to_dealer=0,
+            total_sent_followup_emails=0,
+            total_rvms_sent=0,
+            global_append_rate=0.00,
+            unique_append_rate=0.00,
+            us_append_rate=0.00
+        )
+
+        # save our new dashboard object
+        db_session.add(dashboard)
+        db_session.commit()
 
         # flash message and redirect to store detail
         flash('Store: {}, ID: {} was created successfully... '
