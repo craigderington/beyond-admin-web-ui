@@ -1,9 +1,9 @@
 {% extends "_layout.html" %}
 {% block title %}EARL Admin: Global Dashboard History{% endblock %}
 {% block breadcrumbs %}
-<li><i class="fa dashboard"></i> <a href="{{ url_for('index') }}">Dashboard</a></li>
-<li><i class="fa fa-calendar-o"></i> Dashboard History</a></li>
-<li>Showing last {{ dashboard_count }} historical dashboard records.</li>
+<li><i class="fa fa-dashboard"></i> <a href="{{ url_for('index') }}">Dashboard</a></li>
+<li><strong><i class="fa fa-calendar-check-o"></i> Dashboard History</strong></li>
+<li>Showing last <span class="badge badge-primary badge-square">{{ dashboard_count }}</span> historical dashboard records.</li>
 {% endblock %}
 
 {% block content %}
