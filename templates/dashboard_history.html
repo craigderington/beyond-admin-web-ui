@@ -1,8 +1,8 @@
 {% extends "_layout.html" %}
 {% block title %}EARL Admin: Global Dashboard History{% endblock %}
 {% block breadcrumbs %}
-<li><a href="{{ url_for('index') }}">Dashboard</a></li>
-<li><a href="{{ url_for('dashboard_history') }}"> Dashboard History</a></li>
+<li><i class="fa dashboard"></i> <a href="{{ url_for('index') }}">Dashboard</a></li>
+<li><i class="fa fa-calendar-o"></i> Dashboard History</a></li>
 <li>Showing last {{ dashboard_count }} historical dashboard records.</li>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 
         <div class="well with-header with-footer">
             <div class="header bg-primary">
-                <i class="fa fa-dashboard"></i> <strong>Historcial Dashboard Records</strong>
+                <i class="fa fa-dashboard"></i> <strong>Historical Dashboard Records</strong>
             </div>
 
             <table class="table table-hover">
@@ -57,14 +57,14 @@
                 </tbody>
             </table>
             <div class="footer">
-                <span class="badge badge-success badge-square">{{ dashboard_count }}</span> active stores showing...
+                <span class="badge badge-primary badge-square">{{ dashboard_count }}</span> historical dashboard records showing...
             </div>
         </div>
 
 
     {% else %}
 
-        <h3>There are no records to display. </h3>
+        <h3>There are no dashboard records to display. </h3>
 
     {% endif %}
 
