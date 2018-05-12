@@ -22,7 +22,7 @@ import redis
 
 
 # debug
-debug = False
+debug = True
 
 # app config
 app = Flask(__name__)
@@ -41,7 +41,7 @@ app.config['MONGO_SERVER'] = config.MONGO_SERVER
 app.config['MONGO_DB'] = config.MONGO_DB
 
 # Flask-Mail configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp.mailgun.org'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = config.MAIL_USERNAME
@@ -58,7 +58,7 @@ mongo_client = pymongo.MongoClient(app.config['MONGO_SERVER'], 27017, connect=Fa
 mongo_db = mongo_client[app.config['MONGO_DB']]
 
 # define our login_manager
-login_manager = LoginManager(app)
+login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "/auth/login"
 login_manager.login_message = "Login required to access this site."
@@ -919,6 +919,40 @@ def send_email(to, subject, msg_body, **kwargs):
     msg.body = "EARL Dealer Demo UI Test"
     msg.html = msg_body
     send_async_email.delay(msg)
+
+
+@app.route('/campaign/<int:campaign_pk_id>/creative/test', methods=['GET'])
+def send_test_creative(campaign_pk_id, **kwargs):
+    """
+    Send Test Creative Mail function
+    :param campaign_pk_id
+    :param kwargs:
+    :return: celery async task id
+    """
+
+    campaign = db_session.query(Campaign).filter(
+        Campaign.id == campaign_pk_id
+    ).one()
+
+    if campaign:
+        subject = 'TEST TEST TEST ' + campaign.email_subject
+        recipients = "developer@contactdms.com; rank@contactdms.com"
+        msg_body = campaign.creative_header + ' TEST CLIENT NAME ' + campaign.creative_footer
+
+        # create the message
+        msg = Message(
+            subject,
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[recipients, ]
+        )
+        msg.body = ""
+        msg.html = msg_body
+        send_async_email.delay(msg)
+
+        flash('Campaign {} {} test creative email was sent successfully.  '
+              'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+
+        return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=creative')
 
 
 def get_dashboard():

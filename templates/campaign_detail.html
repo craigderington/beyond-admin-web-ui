@@ -271,7 +271,7 @@
                     <div id="creative" class="tab-pane {% if 'creative' in request.full_path %}active{% endif %}">
                         <div class="row">
                             <form role="form" method="post" id="campaign-creative-form">
-                                <div class="col-lg-8">
+                                <div class="col-lg-6">
                                     {{ form.hidden_tag() }}
                                     <div class="form-group">
                                         <label for="creative_header"><strong>Campaign Creative Header</strong></label>
@@ -308,17 +308,32 @@
                                             id="save-campaign-creative"
                                             value="submit"
                                             class="btn btn-lg btn-purple .shiny">
-                                        <i class="fa fa-save"></i> Save {{ campaign.name }} Creative
+                                        <i class="fa fa-save"></i> Save Creative
                                     </button>
                                     <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
-
+                                    {% if campaign.creative_header != "Enter Header" and campaign.creative_footer != "Enter Footer" %}
+                                        <div class="btn-group">
+                                            <a class="btn btn-lg btn-default" href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Creative Actions</a>
+                                            <a class="btn btn-lg btn-default dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a href="{{ url_for('send_test_creative', campaign_pk_id=campaign.id) }}">
+                                                        <i class="fa fa-envelope"></i> Send Test Email
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
                                 </div>
 
-                                <div class="col-lg-4">
-                                    <div class="well-lg">
-                                        <pre>{{ campaign.creative_header }}</pre>
-                                        <pre>{{ campaign.creative_footer }}</pre>
-                                    </div>
+                                <div class="col-lg-6">
+                                    <iframe name="render_email_template"
+                                            width="600"
+                                            height="600"
+                                            srcdoc="{{ campaign.creative_header}} TEST CLIENT NAME {{ campaign.creative_footer }}"
+                                            frameborder="0"
+                                            scrolling="yes">
+                                    </iframe>
                                 </div>
 
                             </form>
