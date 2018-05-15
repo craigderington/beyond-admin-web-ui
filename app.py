@@ -938,7 +938,7 @@ def send_test_creative(campaign_pk_id, **kwargs):
         # check to see if we have a valid campaign
         if campaign:
             subject = 'TEST TEST TEST ' + campaign.email_subject
-            recipients = "earl-validation-email@contactdms.com"
+            recipients = "earl-email-validation@contactdms.com"
             msg_body = campaign.creative_header + ' TEST CLIENT NAME ' + campaign.creative_footer
 
             # create the message
@@ -950,7 +950,7 @@ def send_test_creative(campaign_pk_id, **kwargs):
 
             # modify the message obj
             msg.body = ""
-            msg.add_recipient("rank@contactdms.com")
+            msg.cc("rank@contactdms.com")
             msg.html = msg_body
 
             # send message async, pass to Celery queue
