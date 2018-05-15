@@ -945,12 +945,12 @@ def send_test_creative(campaign_pk_id, **kwargs):
             msg = Message(
                 subject,
                 sender=app.config['MAIL_DEFAULT_SENDER'],
-                recipients=[recipients, ]
+                recipients=[recipients, ],
+                cc="rank@contactdms.com"
             )
 
             # modify the message obj
             msg.body = ""
-            msg.cc("rank@contactdms.com")
             msg.html = msg_body
 
             # send message async, pass to Celery queue
