@@ -939,6 +939,7 @@ def send_test_creative(campaign_pk_id, **kwargs):
         if campaign:
             subject = 'TEST TEST TEST ' + campaign.email_subject
             recipients = "earl-email-validation@contactdms.com"
+            email_copy = "rank@contactdms.com"
             msg_body = campaign.creative_header + ' TEST CLIENT NAME ' + campaign.creative_footer
 
             # create the message
@@ -946,7 +947,7 @@ def send_test_creative(campaign_pk_id, **kwargs):
                 subject,
                 sender=app.config['MAIL_DEFAULT_SENDER'],
                 recipients=[recipients, ],
-                cc="rank@contactdms.com"
+                cc=[email_copy]
             )
 
             # modify the message obj
