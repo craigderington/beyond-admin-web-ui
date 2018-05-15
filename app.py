@@ -22,7 +22,7 @@ import redis
 
 
 # debug
-debug = True
+debug = False
 
 # app config
 app = Flask(__name__)
@@ -930,29 +930,43 @@ def send_test_creative(campaign_pk_id, **kwargs):
     :return: celery async task id
     """
 
-    campaign = db_session.query(Campaign).filter(
-        Campaign.id == campaign_pk_id
-    ).one()
+    try:
+        campaign = db_session.query(Campaign).filter(
+            Campaign.id == campaign_pk_id
+        ).one()
 
-    if campaign:
-        subject = 'TEST TEST TEST ' + campaign.email_subject
-        recipients = "developer@contactdms.com; rank@contactdms.com"
-        msg_body = campaign.creative_header + ' TEST CLIENT NAME ' + campaign.creative_footer
+        # check to see if we have a valid campaign
+        if campaign:
+            subject = 'TEST TEST TEST ' + campaign.email_subject
+            recipients = "earl-validation-email@contactdms.com"
+            msg_body = campaign.creative_header + ' TEST CLIENT NAME ' + campaign.creative_footer
 
-        # create the message
-        msg = Message(
-            subject,
-            sender=app.config['MAIL_DEFAULT_SENDER'],
-            recipients=[recipients, ]
-        )
-        msg.body = ""
-        msg.html = msg_body
-        send_async_email.delay(msg)
+            # create the message
+            msg = Message(
+                subject,
+                sender=app.config['MAIL_DEFAULT_SENDER'],
+                recipients=[recipients, ]
+            )
 
-        flash('Campaign {} {} test creative email was sent successfully.  '
-              'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+            # modify the message obj
+            msg.body = ""
+            msg.add_recipient("rank@contactdms.com")
+            msg.html = msg_body
 
-        return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=creative')
+            # send message async, pass to Celery queue
+            send_async_email.delay(msg)
+
+            # flash a message and show result
+            flash('Campaign {} {} test creative email was sent successfully.  '
+                  'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+
+            # redirect back to creative page
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=creative')
+
+    except exc.SQLAlchemyError as err:
+        # flash an error message
+        flash('Database returned error: {}'.format(str(err)), category='danger')
+        return redirect(url_for('index'))
 
 
 def get_dashboard():
