@@ -41,13 +41,13 @@
                             <td>{{ dashboard.last_update }}</td>
                             <td>{{ dashboard.total_stores}} / {{ dashboard.active_stores }}</td>
                             <td>{{ dashboard.total_campaigns }} / {{ dashboard.active_campaigns }}</td>
-                            <td>{{ dashboard.total_global_visitors }}</td>
-                            <td>{{ dashboard.total_unique_visitors }}</td>
-                            <td>{{ dashboard.total_us_visitors }}</td>
-                            <td>{{ dashboard.total_appends }}</td>
-                            <td>{{ dashboard.total_sent_to_dealer }}</td>
-                            <td>{{ dashboard.total_sent_followup_emails }}</td>
-                            <td>{{ dashboard.total_rvms_sent }}</td>
+                            <td>{{ dashboard.total_global_visitors|formatnumber }}</td>
+                            <td>{{ dashboard.total_unique_visitors|formatnumber}}</td>
+                            <td>{{ dashboard.total_us_visitors|formatnumber }}</td>
+                            <td>{{ dashboard.total_appends|formatnumber }}</td>
+                            <td>{{ dashboard.total_sent_to_dealer|formatnumber }}</td>
+                            <td>{{ dashboard.total_sent_followup_emails|formatnumber }}</td>
+                            <td>{{ dashboard.total_rvms_sent|formatnumber }}</td>
                             <td>{{ dashboard.global_append_rate }} %</td>
                             <td>{{ dashboard.unique_append_rate }} %</td>
                             <td>{{ dashboard.us_append_rate }} %</td>

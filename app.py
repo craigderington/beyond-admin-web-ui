@@ -947,7 +947,7 @@ def send_test_creative(campaign_pk_id, **kwargs):
                 subject,
                 sender=app.config['MAIL_DEFAULT_SENDER'],
                 recipients=[recipients, ],
-                cc=[email_copy]
+                cc=[email_copy, ]
             )
 
             # modify the message obj
@@ -1012,6 +1012,12 @@ def format_date(value):
 def format_date(value):
     dt = value
     return dt.strftime('%m/%d/%Y')
+
+
+@app.template_filter('formatnumber')
+def format_number(value):
+    _val = int(value)
+    return '{:,}'.format(_val)
 
 
 @app.template_filter('formatphonenumber')

@@ -74,7 +74,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
-                <span class="databox-number sky">{{ dashboard.total_global_visitors }}</span>
+                <span class="databox-number sky">{{ dashboard.total_global_visitors|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL GLOBAL VISITORS</div>
             </div>
         </div>
@@ -88,7 +88,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-primary bg-white">
-                <span class="databox-number primary">{{ dashboard.total_unique_visitors }}</span>
+                <span class="databox-number primary">{{ dashboard.total_unique_visitors|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL UNIQUE VISITORS</div>
             </div>
         </div>
@@ -102,7 +102,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-success bg-white">
-                <span class="databox-number success">{{ dashboard.total_us_visitors }}</span>
+                <span class="databox-number success">{{ dashboard.total_us_visitors|formatnumber }}</span>
                 <div class="databox-text success">TOTAL U.S. VISITORS</div>
             </div>
         </div>
@@ -116,7 +116,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-darkorange bg-white">
-                <span class="databox-number darkorange">{{ dashboard.total_appends }}</span>
+                <span class="databox-number darkorange">{{ dashboard.total_appends|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL APPENDS</div>
             </div>
         </div>
@@ -132,7 +132,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-sky bg-white">
-                <span class="databox-number sky">{{ dashboard.total_sent_to_dealer }}</span>
+                <span class="databox-number sky">{{ dashboard.total_sent_to_dealer|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL SENT TO DEALER</div>
             </div>
         </div>
@@ -146,7 +146,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-primary bg-white">
-                <span class="databox-number primary">{{ dashboard.total_sent_followup_emails }}</span>
+                <span class="databox-number primary">{{ dashboard.total_sent_followup_emails|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL SENT FOLLOWUP EMAILS</div>
             </div>
         </div>
@@ -160,7 +160,7 @@
                 </span>
             </div>
             <div class="databox-right bordered-thick bordered-success bg-white">
-                <span class="databox-number success">{{ dashboard.total_rvms_sent }}</span>
+                <span class="databox-number success">{{ dashboard.total_rvms_sent|formatnumber }}</span>
                 <div class="databox-text darkgray">TOTAL RVMS SENT</div>
             </div>
         </div>
