@@ -106,3 +106,7 @@ class RVMForm(FlaskForm):
 
 class CampaignStoreFilterForm(FlaskForm):
     store_id = IntegerField('Store ID:', validators=[DataRequired()])
+
+
+class SearchStoreForm(FlaskForm):
+    store_name = StringField('Store Name:', validators=[DataRequired()])

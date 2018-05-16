@@ -10,7 +10,8 @@ from celery import Celery
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact, \
     GlobalDashboard, StoreDashboard, CampaignDashboard
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
-    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm
+    ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm, \
+    SearchStoreForm
 import config
 import random
 import datetime
@@ -175,7 +176,7 @@ def dashboard_history():
     )
 
 
-@app.route('/stores', methods=['GET'])
+@app.route('/stores', methods=['GET', 'POST'])
 @login_required
 def stores():
     """
@@ -184,19 +185,34 @@ def stores():
     :return: store list
     """
     store_count = 0
+    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.id.desc()).limit(20).all()
+    store_count = len(stores)
+    form = SearchStoreForm(request.form)
 
-    stores = db_session.query(Store).filter(
-        Store.status == 'Active'
-    ).all()
+    if request.method == 'POST':
 
-    if stores:
-        store_count = len(stores)
+        # get the search name
+        search = request.form.get('store_name', None)
+
+        if search is not None and form.validate_on_submit():
+
+            # make sure we have a string
+            search = str(search)
+
+            # get the stores and apply the search filter
+            stores = db_session.query(Store).filter(
+                Store.name.like('%' + search + '%')
+            ).all()
+
+            if stores:
+                store_count = len(stores)
 
     return render_template(
         'stores.html',
         stores=stores,
         store_count=store_count,
-        today=get_date()
+        today=get_date(),
+        form=form
     )
 
 

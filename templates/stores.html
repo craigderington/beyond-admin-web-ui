@@ -11,19 +11,37 @@
 
         <div class="well with-header with-footer">
             <div class="header bg-success">
-                <i class="fa fa-bank"></i> <strong>Active Store List</strong>
+                <i class="fa fa-bank"></i> <strong>Search Store List</strong>
             </div>
             <span class="pull-left">
-                <div class="form-group">
-                    <span class="input-icon inverted">
-                        <input type="text" class="form-control col-lg-6 input-sm" placeholder="Search Stores">
-                        <i class="fa fa-search bg-default"></i>
-                    </span>
+                <div class="col-lg-6">
+                    <form name="search-store" action="{{ url_for('stores') }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control input-md"
+                                   name="store_name"
+                                   placeholder="Search Stores by Store Name"
+                                   value="{% if request.form %}{{ request.form.get('store_name') }}{% endif %}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-md btn-default .shiny" type="submit">
+                                        <i class="fa fa-search"></i> Search
+                                    </button>
+                                    {% if request.form %}
+                                        <a href="{{ url_for('stores') }}"
+                                           style="margin-left: 5px;"
+                                           class="btn btn-md btn-danger .shiny">
+                                            <i class="fa fa-times-circle"></i> Reset
+                                        </a>
+                                    {% endif %}
+                                </span>
+                        </div>
+                    </form>
                 </div>
             </span>
-            <span class="pull-right" style="margin-top: -10px;margin-bottom: 10px;">
-                <a href="#" class="btn btn-sm btn-default .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
-                <a href="{{ url_for('store_add') }}" class="btn btn-sm btn-azure .shiny">
+            <span class="pull-right" style="margin-top: -30px;margin-bottom: 20px;">
+                <a href="#" class="btn btn-md btn-default .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
+                <a href="{{ url_for('store_add') }}" class="btn btn-md btn-primary .shiny">
                     <i class="fa fa-plus-circle"></i> Add Store
                 </a>
             </span>
@@ -71,7 +89,20 @@
 
     {% else %}
 
-        <h3>There are no stores to display.  Click add store to get started...</h3>
+        <div class="well with-header with-footer">
+            <div class="header bg-success">
+                <i class="fa fa-info-circle"></i> <strong>No Results Found...</strong>
+            </div>
+            {% if request.form %}
+            <h3>No results found matching your search term: <strong>{{ request.form.get('store_name') }}</strong></h3>
+            <a href="{{ url_for('stores') }}"
+               class="btn btn-lg btn-primary .shiny">
+                <i class="fa fa-times-circle"></i> Reset Form
+            </a>
+            {% else %}
+            <h3>The store list is empty.  Click here to <a href="{{ url_for('store_add') }}">add a new store</a>.</h3>
+            {% endif %}
+        </div>
 
     {% endif %}
 
