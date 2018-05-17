@@ -29,6 +29,9 @@
                 {% endif %}
                 <div class="header-description">
                     {{ campaign.campaign_type }}
+                    <a href="{{ url_for('store_detail', store_pk_id=campaign.store_id) }}?=campaigns" class="label label-primary pull-right">
+                        <i class="fa fa-th-list"></i> View All {{ campaign.store }} Campaigns
+                    </a>
                 </div>
             </div>
         </div><!-- end: profile-header -->
@@ -63,7 +66,7 @@
                             Campaign RVM
                         </a>
                     </li>
-                    <li class="tab-default {% if active_tab == 'stats' %}active{% endif %}">
+                    <li class="tab-default {% if 'stats' in request.full_path %}active{% endif %}">
                         <a data-toggle="tab" href="#stats">
                             Campaign Stats
                         </a>
