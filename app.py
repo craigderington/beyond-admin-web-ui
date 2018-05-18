@@ -185,7 +185,47 @@ def stores():
     :return: store list
     """
     store_count = 0
-    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.id.desc()).limit(20).all()
+    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.name.asc()).limit(20).all()
+    store_count = len(stores)
+    form = SearchStoreForm(request.form)
+
+    if request.method == 'POST':
+
+        # get the search name
+        search = request.form.get('store_name', None)
+
+        if search is not None and form.validate_on_submit():
+
+            # make sure we have a string
+            search = str(search)
+
+            # get the stores and apply the search filter
+            stores = db_session.query(Store).filter(
+                Store.name.like('%' + search + '%')
+            ).order_by(Store.name.asc()).all()
+
+            if stores:
+                store_count = len(stores)
+
+    return render_template(
+        'stores.html',
+        stores=stores,
+        store_count=store_count,
+        today=get_date(),
+        form=form
+    )
+
+
+@app.route('/stores/all', methods=['GET', 'POST'])
+@login_required
+def stores_all():
+    """
+    Get a list of active stores
+    :param none
+    :return: store list
+    """
+    store_count = 0
+    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.name.asc()).all()
     store_count = len(stores)
     form = SearchStoreForm(request.form)
 

@@ -3,6 +3,11 @@
 {% block page_header %}Manage Stores{% endblock %}
 {% block breadcrumbs %}
 <li><a href="{{ url_for('stores') }}">Stores</a></li>
+{% if 'all' in request.full_path %}
+<li>All Stores</li>
+{% else %}
+<li>Search Store List</li>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -10,9 +15,15 @@
     {% if stores %}
 
         <div class="well with-header with-footer">
+            {% if not 'all' in request.full_path %}
             <div class="header bg-success">
-                <i class="fa fa-bank"></i> <strong>Search Store List</strong>
+                <i class="fa fa-search"></i> <strong>Search Store List</strong>
             </div>
+            {% else %}
+            <div class="header bg-primary">
+                <i class="fa fa-th-list"></i> <strong>Store List &raquo; All Stores &raquo; Showing {{ store_count }} active stores.</strong>
+            </div>
+            {% endif %}
             <span class="pull-left">
                 <div class="col-lg-6">
                     <form name="search-store" action="{{ url_for('stores') }}" method="post">
@@ -40,7 +51,12 @@
                 </div>
             </span>
             <span class="pull-right" style="margin-top: -30px;margin-bottom: 20px;">
-                <a href="#" class="btn btn-md btn-default .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
+                {% if not 'all' in request.full_path %}
+                <a href="{{ url_for('stores_all') }}" class="btn btn-md btn-default .shiny">
+                    <i class="fa fa-briefcase"></i> View All Stores
+                </a>
+                {% endif %}
+                <a href="#" class="btn btn-md btn-blue .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
                 <a href="{{ url_for('store_add') }}" class="btn btn-md btn-primary .shiny">
                     <i class="fa fa-plus-circle"></i> Add Store
                 </a>
@@ -90,7 +106,7 @@
     {% else %}
 
         <div class="well with-header with-footer">
-            <div class="header bg-success">
+            <div class="header bg-darkorange">
                 <i class="fa fa-info-circle"></i> <strong>No Results Found...</strong>
             </div>
             {% if request.form %}
