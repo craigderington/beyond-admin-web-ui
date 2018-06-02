@@ -11,7 +11,7 @@ from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor
     GlobalDashboard, StoreDashboard, CampaignDashboard
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
     ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm, \
-    SearchStoreForm
+    SearchStoreForm, ArchiveCampaignForm, ArchiveStoreForm
 import config
 import random
 import datetime
@@ -185,7 +185,10 @@ def stores():
     :return: store list
     """
     store_count = 0
-    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.name.asc()).limit(20).all()
+    stores = db_session.query(Store).filter(
+        Store.status == 'ACTIVE',
+        Store.archived == 0
+    ).order_by(Store.name.asc()).limit(20).all()
     store_count = len(stores)
     form = SearchStoreForm(request.form)
 
@@ -225,7 +228,10 @@ def stores_all():
     :return: store list
     """
     store_count = 0
-    stores = db_session.query(Store).filter(Store.status == 'ACTIVE').order_by(Store.name.asc()).all()
+    stores = db_session.query(Store).filter(
+        Store.status == 'ACTIVE',
+        Store.archived == 0
+    ).order_by(Store.name.asc()).all()
     store_count = len(stores)
     form = SearchStoreForm(request.form)
 
@@ -256,6 +262,80 @@ def stores_all():
     )
 
 
+@app.route('/store/<int:store_pk_id>/archive', methods=['GET', 'POST'])
+def store_archive(store_pk_id):
+    """
+    Template to archive a store
+    :param store_pk_id:
+    :return: queryset
+    """
+    form = ArchiveStoreForm()
+    store = None
+
+    try:
+        store = db_session.query(Store).filter(
+            Store.id == store_pk_id
+        ).one()
+
+        if store:
+            if request.method == 'POST' and form.validate_on_submit():
+                if 'archive-store' in request.form.keys():
+
+                    store.status = 'INACTIVE'
+                    store.archived = 1
+                    store.archived_by = current_user.username
+                    store.archived_date = datetime.datetime.now()
+
+                    # commit the changes to the database and redirect
+                    db_session.commit()
+                    flash('Store: {} was successfully archived by {} on {}'.format(store.id,
+                                                                                   current_user.username,
+                                                                                   store.archived_date),
+                          category='success')
+                    return redirect(url_for('stores'))
+
+    except exc.SQLAlchemyError as db_err:
+        flash('The database returned error: {}'.format(str(db_err)), category='danger')
+        return redirect(url_for('index'))
+
+    # return the reponse to the view
+    return render_template(
+        'store_archive.html',
+        store=store,
+        form=form,
+        today=get_date()
+    )
+
+
+@app.route('/stores/archived')
+def stores_archived():
+    """
+    List of archived stores
+    :return: list
+    """
+    archived_stores = None
+    archived_store_count = 0
+
+    try:
+        archived_stores = db_session.query(Store).filter(
+            Store.archived == 1
+        ).order_by(Store.name.asc()).all()
+
+        if archived_stores:
+            archived_store_count = len(archived_stores)
+
+    except exc.SQLAlchemyError as db_err:
+        flash('The database returned error {}'.format(str(db_err)), category='danger')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'archived_stores.html',
+        archived_stores=archived_stores,
+        archived_store_count=archived_store_count,
+        today=get_date()
+    )
+
+
 @app.route('/store/<int:store_pk_id>', methods=['GET', 'POST'])
 def store_detail(store_pk_id):
     """
@@ -271,7 +351,8 @@ def store_detail(store_pk_id):
     campaigns = db_session.query(Campaign).order_by(
         Campaign.created_date.desc()
     ).filter(
-        Campaign.store_id == store_pk_id
+        Campaign.store_id == store_pk_id,
+        Campaign.archived == 0
     ).limit(100).all()
 
     contacts = db_session.query(Contact).order_by(
@@ -443,14 +524,16 @@ def campaigns():
     campaign_count = 0
 
     store_filter = db_session.query(Store).filter(
-        Store.status == 'ACTIVE'
+        Store.status == 'ACTIVE',
+        Store.archived == 0
     ).order_by(Store.name.asc()).all()
 
     if request.method == 'POST' and form.validate_on_submit():
         store_id = form.store_id.data
 
         campaigns = db_session.query(Campaign).filter(
-            Campaign.store_id == store_id
+            Campaign.store_id == store_id,
+            Campaign.archived == 0
         ).order_by(
             Campaign.created_date.desc()
         ).limit(50).all()
@@ -673,6 +756,78 @@ def campaign_add():
     )
 
 
+@app.route('/campaign/<int:campaign_pk_id>/archive', methods=['GET', 'POST'])
+@login_required
+def campaign_archive(campaign_pk_id):
+
+    campaign = None
+    form = ArchiveCampaignForm()
+
+    try:
+        campaign = db_session.query(Campaign).filter(
+            Campaign.id == campaign_pk_id
+        ).one()
+
+        if campaign.archived is True:
+            flash('Campaign {} is already archived. You will be redirected...'.format(campaign.id), category='danger')
+            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id))
+        else:
+            if request.method == 'POST' and form.validate_on_submit():
+                if 'archive-campaign' in request.form.keys():
+                    campaign.archived = 1
+                    campaign.archived_by = current_user.username
+                    campaign.archived_date = datetime.datetime.now()
+                    campaign.status = 'INACTIVE'
+
+                    # commit to the database and redirect
+                    db_session.commit()
+                    flash('Campaign: {} {} {} has been successfully archived.  '
+                          'View archived campaigns to restore.'.format(campaign.id,
+                                                                       campaign.name,
+                                                                       campaign.job_number), category='info')
+                    return redirect(url_for('campaigns'))
+
+    except exc.SQLAlchemyError as db_err:
+        flash('The database returned error: {}'.format(str(db_err)), category='danger')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'campaign_archive.html',
+        campaign=campaign,
+        form=form,
+        today=get_date()
+    )
+
+
+@app.route('/campaigns/archived', methods=['GET', 'POST'])
+def campaigns_archived():
+    """
+    Show a list of archived campaigns by store
+    :return: list
+    """
+    archived = []
+    archived_count = 0
+
+    try:
+        archived = db_session.query(Campaign).filter(
+            Campaign.archived == 1
+        ).order_by(Campaign.store_id.asc()).all()
+
+        if archived:
+            archived_count = len(archived)
+
+    except exc.SQLAlchemyError as db_err:
+        flash('The database returned error: {}'.format(str(db_err)), category='danger')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'archived_campaigns.html',
+        archived=archived,
+        archived_count=archived_count,
+        today=get_date()
+    )
+
+
 @app.route('/create/pixel/<int:campaign_pk_id>', methods=['GET'])
 def create_pixel(campaign_pk_id):
     """
@@ -690,24 +845,30 @@ def create_pixel(campaign_pk_id):
     campaign = db_session.query(Campaign).get(campaign_pk_id)
 
     if campaign:
-        if tracker:
 
-            # assign the tracker to this campaign
-            campaign.pixeltrackers_id == tracker.id
-            campaign.status = 'ACTIVE'
+        if campaign.archived == 0:
 
-            # commit to the database
-            db_session.commit()
+            if tracker:
 
-            # flash a success message and redirect
-            flash('The Campaign Pixel Tracker was assigned to {}.'.format(tracker.name), category='success')
-            return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
+                # assign the tracker to this campaign
+                campaign.pixeltrackers_id == tracker.id
+                campaign.status = 'ACTIVE'
 
+                # commit to the database
+                db_session.commit()
+
+                # flash a success message and redirect
+                flash('The Campaign Pixel Tracker was assigned to {}.'.format(tracker.name), category='success')
+                return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
+
+            else:
+                # can not assign a tracker.  set the campaign status to inactive and redirect
+                campaign.status = 'INACTIVE'
+                db_session.commit()
+                flash('Sorry, there are no available Pixel Trackers to assign to this campaign.', category='danger')
+                return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
         else:
-            # can not assign a tracker.  set the campaign status to inactive and redirect
-            campaign.status = 'INACTIVE'
-            db_session.commit()
-            flash('Sorry, there are no available Pixel Trackers to assign to this campaign.', category='danger')
+            flash('Can not assign a Pixel Tracker to an Archived Campaign', category='danger')
             return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=tracker')
 
     else:

@@ -56,7 +56,7 @@
                     <i class="fa fa-briefcase"></i> View All Stores
                 </a>
                 {% endif %}
-                <a href="#" class="btn btn-md btn-blue .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
+                <a href="{{ url_for('stores_archived') }}" class="btn btn-md btn-blue .shiny"><i class="fa fa-archive"></i> Archived Stores</a>
                 <a href="{{ url_for('store_add') }}" class="btn btn-md btn-primary .shiny">
                     <i class="fa fa-plus-circle"></i> Add Store
                 </a>
@@ -88,7 +88,7 @@
                                     <i class="fa fa-check-circle-o"></i>
                                 </a>
                                 <a class="btn btn-default btn-sm shiny icon-only danger"
-                                   href="#"
+                                   href="{{ url_for('store_archive', store_pk_id=store.id) }}"
                                    title="Archive Store">
                                     <i class="fa fa-times"></i>
                                 </a>

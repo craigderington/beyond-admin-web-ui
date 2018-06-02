@@ -1,0 +1,89 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Archived Stores{% endblock %}
+{% block page_header %}Manage Archived Stores{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('stores') }}">Stores</a></li>
+<li>Archived Stores</li>
+{% endblock %}
+
+{% block content %}
+
+    {% if archived_stores %}
+
+        <div class="well with-header with-footer">
+
+            <div class="header bg-success">
+                <i class="fa fa-archive"></i> <strong>Archived Store List</strong>
+            </div>
+
+            <span class="pull-right" style="margin-bottom: 20px;">
+
+                <a href="{{ url_for('stores_all') }}" class="btn btn-md btn-primary .shiny">
+                    <i class="fa fa-briefcase"></i> View All Stores
+                </a>
+
+                <a href="{{ url_for('store_add') }}" class="btn btn-md btn-info .shiny">
+                    <i class="fa fa-plus-circle"></i> Add Store
+                </a>
+            </span>
+            <table class="table table-hover">
+                <thead class="bordered-primary">
+                    <tr>
+                        <th>Store Name</th>
+                        <th>ClientID</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for store in archived_stores %}
+                        <tr>
+                            <td><a href="{{ url_for('store_detail', store_pk_id=store.id)}}">{{ store.name}}</a></td>
+                            <td>{{ store.client_id }}</td>
+                            <td>{{ store.city }}</td>
+                            <td>{{ store.state }}</td>
+                            <td><span class="label label-success">{{ store.status}}</span></td>
+                            <td>
+                                <!-- actions -->
+                                <a class="btn btn-default btn-sm shiny icon-only primary"
+                                   href="{{ url_for('store_detail', store_pk_id=store.id)}}"
+                                   title="Edit Store">
+                                    <i class="fa fa-check-circle-o"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="footer">
+                <span class="badge badge-success badge-square">{{ archived_store_count }}</span> archived stores showing...
+            </div>
+        </div>
+
+
+    {% else %}
+
+        <div class="well with-header with-footer">
+            <div class="header bg-darkorange">
+                <i class="fa fa-archive"></i> <strong>Sorry, No Results Found...</strong>
+            </div>
+            <div class="well-body">
+                <p>There are zero archived stores to display.  Use the navigation to leave this page...</p>
+            </div>
+        </div>
+
+    {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

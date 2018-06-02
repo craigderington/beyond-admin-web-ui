@@ -1,0 +1,62 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Archive Store{% endblock %}
+{% block page_header %}Archive Store{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('campaigns') }}">Stores</a></li>
+<li>Archive Store</li>
+<li>{{ store.name }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+    {% for error in form.errors %}
+        <div class="alert alert-danger">
+            <p>{{error}}</p>
+        </div>
+    {% endfor %}
+
+
+    <div class="widget">
+        <div class="widget-header bordered-bottom bordered-blue">
+            <span class="widget-caption"><i class="fa fa-archive"></i> Archive Store</span>
+        </div>
+        <div class="widget-body">
+            <div>
+                <form role="form" method="post" id="archive-store-form">
+                    {{ form.hidden_tag() }}
+
+                    <p class="help-block">Store Name: {{ store.name }}</p>
+                    <p class="help-block">Status: {{ store.status }}</p>
+                    <p class="help-block">Client ID: {{ store.client_id }}</p>
+                    <p class="help-block"></p>
+
+                    <div class="form-group">
+                        <label for="confirm_archive">Enter Name:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="confirm_archive"
+                               name="confirm_archive"
+                               placeholder="Enter your name...">
+                    </div>
+
+                    <p class="help-block">
+                        This store will be archived by <strong>{{ current_user.username }}</strong> effective {{ today }}.
+                    </p>
+
+                    <!-- form actions -->
+                    <hr />
+
+                    <button type="submit" form="archive-store-form" value="submit" class="btn btn-lg btn-primary .shiny">
+                        <i class="fa fa-save"></i> Archive Store
+                    </button>
+                    <input type="hidden" name="archive-store" value="1" />
+                    <a href="{{ url_for('store_detail', store_pk_id=store.id) }}" class="btn btn-lg btn-default .shiny">
+                        <i class="fa fa-times-circle"></i> Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

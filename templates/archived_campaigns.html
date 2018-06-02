@@ -1,0 +1,76 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: List of Archived Campaigns{% endblock %}
+{% block page_header %}Archived Store Campaigns{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('campaigns') }}">Campaigns</a></li>
+<li>Archived Campaigns by Store</li>
+{% endblock %}
+
+
+{% block content %}
+
+        <div class="well with-header with-footer">
+
+            <div class="header bg-success">
+                <i class="fa fa-th-list"></i> <strong>Archived Campaign List By Store </strong>
+            </div>
+
+
+            {% if archived %}
+                <div class="row">
+                    <table class="table table-hover table-striped">
+                        <thead class="bordered-primary">
+                            <tr>
+                                <th>Store Name</th>
+                                <th>Campaign Job Number</th>
+                                <th>Campaign Tactic</th>
+                                <th>Tactic Number</th>
+                                <th>Client ID</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in archived %}
+                                <tr>
+                                    <td>{{ campaign.store }}</td>
+                                    <td><a href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}">{{ campaign.name}}</a></td>
+                                    <td>{{ campaign.campaign_type }}</td>
+                                    <td>{{ campaign.job_number }}</td>
+                                    <td>{{ campaign.client_id }}</td>
+                                    <td>{{ campaign.start_date|formatdate}}</td>
+                                    <td>{{ campaign.end_date|formatdate }}</td>
+                                    <td><span class="label label{% if campaign.status == 'ACTIVE' %}-success{% else %}-darkorange{% endif %}">{{ campaign.status }}</span></td>
+                                    <td>
+                                        <a class="btn btn-default btn-sm shiny icon-only"
+                                           href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
+                                           title="Get Campaign">
+                                            <i class="fa fa-check-circle"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <div class="footer">
+                        <span class="badge badge-success badge-square">{{ archived_count }}</span> archived campaigns showing...
+                    </div>
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-info alert-block alert-dismissible" style="margin-top: 25px;">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <p><i class="fa fa-warning"></i> There are no archived campaigns to display.  Please click <a href="{{ url_for('campaigns') }}">here</a> to go back...</h4></p>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+{% endblock %}

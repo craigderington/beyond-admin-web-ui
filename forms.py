@@ -110,3 +110,11 @@ class CampaignStoreFilterForm(FlaskForm):
 
 class SearchStoreForm(FlaskForm):
     store_name = StringField('Store Name:', validators=[DataRequired()])
+
+
+class ArchiveCampaignForm(FlaskForm):
+    confirm_archive = StringField('Enter Name', validators=[DataRequired()])
+
+
+class ArchiveStoreForm(FlaskForm):
+    confirm_archive = StringField('Enter Name', validators=[DataRequired()])

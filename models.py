@@ -171,10 +171,10 @@ class Lead(Base):
     followup_email_spam = Column(Boolean, default=False, nullable=True)
     followup_email_unsub = Column(Boolean, default=False, nullable=True)
     followup_email_dropped = Column(Boolean, default=False, nullable=True)
-    dropped_reason = Column(String(50))
-    dropped_code = Column(String(50))
-    dropped_description = Column(String(255))
-    bounce_error = Column(String(255))
+    dropped_reason = Column(String(50), nullable=True)
+    dropped_code = Column(String(50), nullable=True)
+    dropped_description = Column(Text)
+    bounce_error = Column(Text)
     followup_email_click_ip = Column(String(255))
     followup_email_click_device = Column(String(255))
     followup_email_click_campaign = Column(String(255))
@@ -209,6 +209,9 @@ class Store(Base):
     simplifi_client_id = Column(String(255))
     simplifi_name = Column(String(255))
     system_notifications = Column(String(255))
+    archived = Column(Boolean(), default=0)
+    archived_by = Column(String(50), nullable=True)
+    archived_date = Column(DateTime, nullable=True)
 
     def __repr__(self):
         return '{}'.format(
@@ -262,6 +265,13 @@ class Campaign(Base):
     rvm_campaign_id = Column(Integer, unique=True, nullable=True, default=0)
     rvm_send_count = Column(Integer, default=0)
     rvm_limit = Column(Integer, nullable=False, default=10000)
+    archived = Column(Boolean(), default=0)
+    archived_by = Column(String(50), nullable=True)
+    archived_date = Column(DateTime, nullable=True)
+    send_dealer = Column(Boolean(), default=0)
+    send_adf = Column(Boolean(), default=0)
+    send_email = Column(Boolean(), default=0)
+    send_rvm = Column(Boolean(), default=0)
 
     def __repr__(self):
         return '{}'.format(

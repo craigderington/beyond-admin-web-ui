@@ -1,0 +1,65 @@
+{% extends "_layout.html" %}
+{% block title %}EARL Admin: Archive Campaign{% endblock %}
+{% block page_header %}Archive Campaign{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('campaigns') }}">Campaigns</a></li>
+<li>Archive Campaign</li>
+<li>{{ campaign.job_number }} / {{ campaign.campaign_type }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+    {% for error in form.errors %}
+        <div class="alert alert-danger">
+            <p>{{error}}</p>
+        </div>
+    {% endfor %}
+
+
+    <div class="widget">
+        <div class="widget-header bordered-bottom bordered-blue">
+            <span class="widget-caption"><i class="fa fa-archive"></i> Archive Campaign</span>
+        </div>
+        <div class="widget-body">
+            <div>
+                <form role="form" method="post" id="archive-campaign-form">
+                    {{ form.hidden_tag() }}
+
+                    <p class="help-block">Campaign ID: {{ campaign.id }}</p>
+                    <p class="help-block">Campaign Job Number: {{ campaign.name }}</p>
+                    <p class="help-block">Campaign Tactic: {{ campaign.campaign_type }}</p>
+                    <p class="help-block">Status: {% if campaign.status == 'ACTIVE' %}<span class="label label-success">
+                        {{ campaign.status }}</span> <i> Important - This action will change the campaign status to inactive.</i>{% else %}<span class="label label-danger">INACTIVE</span> {% endif %}
+                    </p>
+                    <p class="help-block">Campaign End Date: {{ campaign.end_date }}</p>
+
+                    <div class="form-group">
+                        <label for="confirm_archive">Enter Name:</label>
+                        <input type="text"
+                               class="form-control"
+                               id="confirm_archive"
+                               name="confirm_archive"
+                               placeholder="Enter your name...">
+                    </div>
+
+                    <p class="help-block">
+                        This campaign will be archived by <strong>{{ current_user.username }}</strong> effective {{ today }}.
+                    </p>
+
+                    <!-- form actions -->
+                    <hr />
+
+                    <button type="submit" form="archive-campaign-form" value="submit" class="btn btn-lg btn-primary .shiny">
+                        <i class="fa fa-save"></i> Archive Campaign
+                    </button>
+                    <input type="hidden" name="archive-campaign" value="1" />
+                    <a href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}" class="btn btn-lg btn-default .shiny">
+                        <i class="fa fa-times-circle"></i> Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

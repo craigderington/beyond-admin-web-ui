@@ -177,7 +177,7 @@
                                             id="save-campaign-approval"
                                             value="submit"
                                             class="btn btn-lg btn-darkorange .shiny">
-                                        <i class="fa fa-save"></i> Save {{ campaign.name }} Campaign Approval
+                                        <i class="fa fa-save"></i> Save Campaign Approval
                                     </button>
                                     <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
                                 </div>
@@ -378,7 +378,7 @@
                                             id="save-campaign-rvm"
                                             value="submit"
                                             class="btn btn-lg btn-primary .shiny">
-                                        <i class="fa fa-save"></i> Save {{ campaign.name }} RVM Settings
+                                        <i class="fa fa-save"></i> Save RVM Settings
                                     </button>
                                     <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
 
@@ -386,7 +386,7 @@
 
                                 <div class="col-lg-4">
                                     <div class="well-lg">
-                                        <p class="help-block">RVM Send Count for {{ campaign.name }}</p>
+                                        <p class="help-block">RVM Send Count for {{ campaign.campaign_type }}</p>
                                         {% if campaign.rvm_send_count %}
                                         <h1>{{ campaign.rvm_send_count }}</h1>
                                         {% else %}
@@ -506,7 +506,7 @@
                                 <div class="col-lg-6">
                                     {{ form.hidden_tag() }}
                                     <div class="form-group">
-                                        <label for="job_number">Job Number:</label>
+                                        <label for="job_number">Tactic Number:</label>
                                         <input type="text"
                                                class="form-control"
                                                id="job_number"
@@ -568,7 +568,7 @@
                                                value="{{ campaign.client_id }}">
                                     </div>
                                     <div class="form-group">
-                                        <label for="name">Campaign Name:</label>
+                                        <label for="name">Campaign Job Number:</label>
                                         <input type="text"
                                                class="form-control"
                                                id="name"
@@ -611,11 +611,12 @@
                                             id="save-campaign-settings"
                                             value="submit"
                                             class="btn btn-lg btn-primary .shiny">
-                                        <i class="fa fa-save"></i> Save {{ campaign.name }} Campaign
+                                        <i class="fa fa-save"></i> Save Campaign
                                     </button>
                                     <input type="hidden" name="store_id" value="{{ store.id }}" />
                                     <input type="hidden" name="campaign_type" value="{{ campaign.type }}" />
                                     <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                                    <a href="{{ url_for('campaign_archive', campaign_pk_id=campaign.id) }}" class="btn btn-lg btn-danger .shiny pull-right"><i class="fa fa-archive"></i> Archive Campaign</a>
                                 </div>
                             </form>
                         </div>

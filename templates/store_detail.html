@@ -15,10 +15,19 @@
             </div>
             <div class="col-lg-5 col-md-8 col-sm-12 profile-info">
                 <div class="header-fullname"><h1>{{ store.name }}</h1></div>
-                <a href="#" class="btn btn-success btn-sm  btn-follow">
-                    <i class="fa fa-check"></i>
-                    ACTIVE
-                </a>
+
+                    {% if store.archived == 0 %}
+                        {% if store.status == 'ACTIVE' %}
+                            <a href="#" class="btn btn-success btn-sm  btn-follow">
+                                <i class="fa fa-check"></i> ACTIVE
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="#" class="btn btn-danger btn-sm  btn-follow">
+                            <i class="fa fa-times-circle"></i> STORE ARCHIVED
+                        </a>
+                    {% endif %}
+
                 <div class="header-description">
                     {{ store.address1 }} {{ store.address2 }} <br />
                     {{ store.city }}, {{store.state.upper() }}  {{ store.zip_code }}
@@ -92,9 +101,9 @@
                             <table class="table table-hover table-striped">
                                 <thead class="bordered-primary">
                                     <tr>
-                                        <th>Campaign Name</th>
-                                        <th>Campaign Type</th>
-                                        <th>Job Number</th>
+                                        <th>Campaign Job Number</th>
+                                        <th>Campaign Tactic</th>
+                                        <th>Tactic Number</th>
                                         <th>Client ID</th>
                                         <th>Status</th>
                                         <th>Start Date</th>
@@ -121,6 +130,11 @@
                                                    href="{{ url_for('campaign_detail', campaign_pk_id=campaign.id) }}"
                                                    title="Get Campaign">
                                                     <i class="fa fa-check-circle"></i>
+                                                </a>
+                                                <a class="btn btn-default btn-sm shiny icon-only"
+                                                   href="{{ url_for('campaign_archive', campaign_pk_id=campaign.id) }}"
+                                                   title="Archive Campaign">
+                                                    <i class="fa fa-archive"></i>
                                                 </a>
                                                 <a class="btn btn-default btn-sm shiny icon-only"
                                                    href="{{ url_for('stores') }}"
@@ -380,6 +394,11 @@
                                     <a href="{{ url_for('stores') }}" class="btn btn-lg btn-default .shiny">
                                         <i class="fa fa-times-circle"></i> Cancel
                                     </a>
+                                    {% if store.archived == 0 %}
+                                    <a href="{{ url_for('store_archive', store_pk_id=store.id) }}" class="btn btn-lg btn-danger .shiny pull-right">
+                                        <i class="fa fa-times-circle"></i> Archive Store
+                                    </a>
+                                    {% endif %}
                                 </div>
                             </form>
                         </div>
