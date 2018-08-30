@@ -1,0 +1,84 @@
+{% extends "_layout.html" %}
+
+{% block title %}EARL Administration{% endblock %}
+{% block page_header %}Admin{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin') }}">Admin</a></li>
+<li>Announcements</li>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="widget flat radius-bordered">
+        <div class="widget-header bg-success">
+            <span class="widget-caption"><i class="fa fa-bullhorn"></i> <strong>EARL Announcements</strong></span>
+        </div>
+
+        <div class="widget-body">
+            <div class="row">
+                <span style="margin-left:20px;">
+                    <a href="{{ url_for('announcement_add')}}" class="btn btn-sm btn-default">
+                        <i class="fa fa-plus-circle"></i> Add Announcement</a>
+                </span>
+            </div>
+            <table class="table table-hover">
+                <thead class="bordered-success">
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Date Sent</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for announcement in announcements %}
+                    <tr>
+                        <td width="5%">{{ announcement.id }}</td>
+                        <td width="35%">{{ announcement.msg_subject }}</td>
+                        <td width="10%">
+                            <span class="label label-{% if announcement.sent_status == 'Not Sent' %}danger{% else %}success{% endif %}">
+                                {{ announcement.sent_status }}
+                            </span>
+                        </td>
+                        <td width="15%">{% if announcement.sent_date %}{{ announcement.sent_date|formatdate }}{% endif %}</td>
+                        <td><a href="{{ url_for('send_announcement', announcement_pk_id=announcement.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fa fa-envelope"></i>  Send Now
+                            </a>
+                            <a href="{{ url_for('announcement_edit', announcement_pk_id=announcement.id) }}" class="btn btn-sm btn-default">
+                                <i class="fa fa-edit"></i> Edit
+                            </a>
+                            <a href="{{ url_for('announcement_delete', announcement_pk_id=announcement.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this announcement?')">
+                                <i class="fa fa-times-circle"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5">The system found <span class="badge badge-success badge-square">{{ announcement_count }} </span> announcement{% if announcement_count != 1 %}s{% endif %}.</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div><!-- end: widget body -->
+    </div><!-- end: widget bordered -->
+
+{% endblock %}
+
+
+{% block js %}
+    {{ super() }}
+
+    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/fuelux/treeview/tree-custom.min.js"></script>
+<!--
+<script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/fuelux/treeview/treeview-init.js"></script>
+-->
+    <script>
+        $(document).ready(function () {
+            UITree.init();
+        });
+    </script>
+
+{% endblock %}

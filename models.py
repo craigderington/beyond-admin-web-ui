@@ -389,3 +389,21 @@ class CampaignDashboard(Base):
             self.campaign_name,
             str(self.last_update)
         )
+
+
+class Announcement(Base):
+    __tablename__ = 'announcements'
+    id = Column(Integer, primary_key=True)
+    msg_subject = Column(String(255), unique=True, nullable=False)
+    msg_body = Column(Text)
+    send_date = Column(DateTime, nullable=True)
+    sent_date = Column(DateTime, nullable=True)
+    sent_status = Column(String(50), default='Not Sent')
+
+    def __repr__(self):
+        return '{}-{} {} on {}'.format(
+            self.id,
+            self.msg_subject,
+            self.sent_status,
+            self.sent_date
+        )

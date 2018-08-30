@@ -1,0 +1,85 @@
+{% extends "_layout.html" %}
+
+{% block title %}EARL Administration{% endblock %}
+{% block page_header %}Admin{% endblock %}
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin') }}">Admin</a></li>
+<li><a href="{{ url_for('announcement_list') }}">Announcements</a></li>
+<li>Add Announcement</li>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="col-lg-12">
+        <div class="widget flat radius-bordered">
+            <div class="widget-header bg-primary">
+                <span class="widget-caption">ADD EARL Announcement</span>
+            </div>
+            <div class="widget-body">
+                <div id="registration-form">
+                    <form role="form" method="post" id="add-announcement-form">
+                        {{ form.hidden_tag() }}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="msg_subject">Message Subject</label>
+                                    <span class="input-icon icon-right">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="msg_subject"
+                                               name="msg_subject"
+                                               placeholder="Enter Message Subject">
+                                        <i class="fa fa-envelope blue"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="msg_body">Message</label>
+                                    <span class="input-icon icon-right">
+                                        <textarea
+                                                class="form-control"
+                                                rows="10"
+                                                id="msg_body"
+                                                name="msg_body">
+                                        </textarea>
+                                        <i class="fa fa-bullhorn darkorange"></i>
+                                    </span>
+                                    <p class="help-block">Your message will be in this text area.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!--
+                        <div class="control-group">
+                            <div class="radio">
+                                <label>
+                                    <input name="send" type="radio" checked="unchecked" value="1">
+                                    <span class="text">Send Now </span>
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input name="send" type="radio" class="disabled">
+                                    <span class="text">Schedule Send</span>
+                                </label>
+                            </div>
+                        </div>
+                        -->
+                        <button type="submit" class="btn btn-lg btn-primary"><i class="fa fa-bullhorn"></i> Save Announcement</button>
+                        <a href="{{ url_for('announcement_list') }}" class="btn btn-default btn-lg"><i class="fa fa-times-circle"></i> Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    {{ super() }}
+{% endblock %}

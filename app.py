@@ -8,13 +8,14 @@ from sqlalchemy import text, and_, exc, func
 from database import db_session
 from celery import Celery
 from models import User, Store, Campaign, CampaignType, Visitor, AppendedVisitor, Lead, PixelTracker, Contact, \
-    GlobalDashboard, StoreDashboard, CampaignDashboard
+    GlobalDashboard, StoreDashboard, CampaignDashboard, Announcement
 from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignForm, CampaignCreativeForm, \
     ReportFilterForm, ContactForm, UserProfileForm, ChangeUserPasswordForm, RVMForm, CampaignStoreFilterForm, \
-    SearchStoreForm, ArchiveCampaignForm, ArchiveStoreForm
+    SearchStoreForm, ArchiveCampaignForm, ArchiveStoreForm, AnnouncementForm
 import config
 import random
 import datetime
+from datetime import timezone
 import hashlib
 import pymongo
 import phonenumbers
@@ -149,6 +150,141 @@ def index():
         campaign_types=get_campaign_types(),
         today=get_date()
     )
+
+
+@app.route('/announcements', methods=['GET'])
+def announcement_list():
+    """
+    Show the announcements list
+    :return: queryset
+    """
+    announcements = None
+    announcement_count = None
+
+    try:
+        announcements = db_session.query(Announcement).order_by(Announcement.id.desc()).all()
+
+        if not announcements:
+            return redirect(url_for('announcement_add'))
+
+        announcement_count = len(announcements)
+
+    except exc.SQLAlchemyError as err:
+        flash('The database returned an error: {}'.format(str(err)), category='danger')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'announcements.html',
+        announcements=announcements,
+        announcement_count=announcement_count,
+        today=get_date()
+    )
+
+
+@app.route('/announcement/add', methods=['GET', 'POST'])
+def announcement_add():
+    """
+    Add new EARL Store announcement
+    :return: redirect
+    """
+
+    form = AnnouncementForm(request.form)
+
+    if request.method == 'POST' and form.validate_on_submit():
+
+        try:
+            new_announcement = Announcement(
+                msg_subject=form.msg_subject.data,
+                msg_body=form.msg_body.data
+            )
+
+            # save and commit
+            db_session.add(new_announcement)
+            db_session.commit()
+
+            # redirect to the announcements list
+            flash('New announcement added successfully', category='success')
+            return redirect(url_for('announcement_list'))
+
+        except exc.SQLAlchemyError as err:
+            flash('Sorry, a database error occurred trying to save the new announcement: {}'.format(str(err)),
+                  category='danger')
+            return redirect(url_for('index'))
+
+    return render_template(
+        'announcement_add.html',
+        form=form,
+        today=get_date()
+    )
+
+
+@app.route('/announcement/<int:announcement_pk_id>/edit', methods=['GET', 'POST'])
+def announcement_edit(announcement_pk_id):
+    """
+    Edit existing EARL Store announcement
+    :param announcement_pk_id
+    :return: redirect
+    """
+
+    form = AnnouncementForm(request.form)
+
+    try:
+        announcement = db_session.query(Announcement).filter(
+            Announcement.id == announcement_pk_id
+        ).one()
+
+        if request.method == 'POST' and form.validate_on_submit():
+
+            # set the values to the form variables
+            announcement.msg_subject = form.msg_subject.data
+            announcement.msg_body = form.msg_body.data
+
+            # save and commit
+            db_session.commit()
+
+            # redirect to the announcements list
+            flash('Announcement {} was successfully updated...'.format(announcement_pk_id), category='success')
+            return redirect(url_for('announcement_list'))
+
+    except exc.SQLAlchemyError as err:
+        flash('Sorry, a database error occurred trying to save the new announcement: {}'.format(str(err)))
+        return redirect(url_for('index'))
+
+    return render_template(
+        'announcement_edit.html',
+        announcement=announcement,
+        form=form,
+        today=get_date()
+    )
+
+
+@app.route('/announcement/<int:announcement_pk_id>/delete', methods=['GET'])
+def announcement_delete(announcement_pk_id):
+    """
+    Delete an EARL Store announcement
+    :param announcement_pk_id
+    :return: redirect
+    """
+
+    try:
+        announcement = db_session.query(Announcement).filter(
+            Announcement.id == announcement_pk_id
+        ).one()
+
+        if announcement:
+
+            # save and commit
+            db_session.delete(announcement)
+            db_session.commit()
+
+            # redirect to the announcements list
+            flash('Announcement {} was successfully deleted...'.format(announcement_pk_id), category='warning')
+            return redirect(url_for('announcement_list'))
+
+    except exc.SQLAlchemyError as err:
+        flash('Sorry, a database error occurred trying to access announcement {}: the error: {}'.format(
+            announcement_pk_id, str(err)))
+        return redirect(url_for('index'))
 
 
 @app.route('/dashboard/history', methods=['GET'])
@@ -393,7 +529,7 @@ def store_detail(store_pk_id):
             store.system_notifications = form.system_notifications.data
             store.reporting_email = form.reporting_email.data
             store.simplifi_client_id = form.simplifi_client_id.data
-            store.system_notifications=form.system_notifications.data
+            store.system_notifications = form.system_notifications.data
 
             # commit to the database
             db_session.commit()
@@ -1136,6 +1272,67 @@ def send_email(to, subject, msg_body, **kwargs):
     msg.body = "EARL Dealer Demo UI Test"
     msg.html = msg_body
     send_async_email.delay(msg)
+
+
+@app.route('/announcement/<int:announcement_pk_id>/send')
+def send_announcement(announcement_pk_id, **kwargs):
+    """
+    Send EARL Announcements function
+    :param announcement_pk_id
+    :param kwargs:
+    :return: celery async task id
+    """
+    today = datetime.datetime.now()
+
+    try:
+        announcement = db_session.query(Announcement).filter(
+            Announcement.id == announcement_pk_id
+        ).one()
+
+        if announcement:
+
+            # get a list of active stores
+            try:
+
+                stores = db_session.query(Store).filter(
+                    Store.status == 'ACTIVE'
+                ).all()
+
+                # loop the stores and set the TO field for the email
+                for store in stores:
+
+                    # set the recipient list to the store system notifications
+                    msg_to = store.system_notifications
+                    # msg_to = "craigderington@python-development-systems.com"
+
+                    if msg_to != '':
+
+                        # send to celery for async
+                        send_email(msg_to, announcement.msg_subject, announcement.msg_body)
+
+                # update the status and sent date
+                announcement.sent_date = today
+                announcement.sent_status = 'SENT'
+                db_session.commit()
+
+                # flash the user a message
+                flash('The announcement emails have been sent to the Celery async mail queue for processing',
+                      category='success')
+                return redirect(url_for('announcement_list'))
+
+            except exc.SQLAlchemyError as err:
+                # flash a message and redirect
+                flash('There were zero active stores found in which to send the announcement', category='danger')
+                return redirect(url_for('announcement_list'))
+
+        else:
+            # announcement ID was not found, flash a message and redirect
+            flash('Announcement {} was not found.  Task aborted.'.format(accouncement_pk_id))
+
+    except exc.SQLAlchemyError as db_err:
+        # flash an error message
+        flash('Database returned error: {}'.format(str(db_err)), category='danger')
+        return redirect(url_for('index'))
 
 
 @app.route('/campaign/<int:campaign_pk_id>/creative/test', methods=['GET'])

@@ -11,57 +11,34 @@
 
     <div class="widget flat radius-bordered">
         <div class="widget-header bg-success">
-            <span class="widget-caption"><i class="fa fa-gears"></i> <strong>EARL Administration Menu</strong></span>
+            <span class="widget-caption"><i class="fa fa-gears"></i> <strong>EARL Administration</strong></span>
         </div>
 
         <div class="widget-body" style="min-height: 500px;">
-            <div class="col-lg-3">
-                <div id="MyTree" class="tree">
-                    <div class="tree-folder" style="display: none;">
-                        <div class="tree-folder-header">
-                            <i class="fa fa-folder"></i>
-                            <div class="tree-folder-name"> Admin Menu</div>
-                        </div>
+            <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+                <div class="orders-container">
+                    <div class="orders-header">
+                        <h6>Admin Menu</h6>
                     </div>
-                    <div class="tree-item" style="display: none;">
-                        <i class="tree-dot"></i>
-                        <div class="tree-item-name"></div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-cog"></i>
-                        <div class="tree-item-name">Systems Logs</div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-users"></i>
-                        <div class="tree-item-name">Users</div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-th-list"></i>
-                        <div class="tree-item-name">Campaign Types</div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-bar-chart"></i>
-                        <div class="tree-item-name">Admin Reports</div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-file-text-o"></i>
-                        <div class="tree-item-name">Automation Logs</div>
-                    </div>
-                    <div class="tree-item" style="display: block;">
-                        <i class="tree-dot"></i>
-                        <i class="fa fa-medkit"></i>
-                        <div class="tree-item-name">System Health Check</div>
-                    </div>
-                </div><!-- end: div tree -->
+                    <ul class="orders-list">
+                        <li class="order-item">
+                            <div class="row">
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-left">
+                                    <div class="item-booker"><strong><i class="fa fa-bullhorn"></i> EARL Announcements</strong></div>
+                                    <div class="item-time">
+                                        <i class="fa fa-info-circle"></i>
+                                        <span>Create, Manage and Send EARL Announcements</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="item-more" href="{{ url_for('announcement_list') }}">
+                                <i></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="col-lg-9">
-                tree item data in div
-            </div>
+
         </div><!-- end: widget body -->
     </div><!-- end: widget bordered -->
 
@@ -70,15 +47,4 @@
 
 {% block js %}
     {{ super() }}
-
-    <script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/fuelux/treeview/tree-custom.min.js"></script>
-<!--
-<script src="//s3.amazonaws.com/earl-admin-theme/html/assets/js/fuelux/treeview/treeview-init.js"></script>
--->
-    <script>
-        $(document).ready(function () {
-            UITree.init();
-        });
-    </script>
-
 {% endblock %}

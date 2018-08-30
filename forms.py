@@ -118,3 +118,8 @@ class ArchiveCampaignForm(FlaskForm):
 
 class ArchiveStoreForm(FlaskForm):
     confirm_archive = StringField('Enter Name', validators=[DataRequired()])
+
+
+class AnnouncementForm(FlaskForm):
+    msg_subject = StringField('Enter Message Subject', validators=[DataRequired()])
+    msg_body = StringField('Enter Message Body', validators=[DataRequired()])
