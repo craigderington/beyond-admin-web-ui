@@ -52,6 +52,12 @@
                                    title="Edit Store">
                                     <i class="fa fa-check-circle-o"></i>
                                 </a>
+                                <a class="btn btn-default btn-sm shiny icon-only danger"
+                                   href="{{ url_for('store_reactivate', store_pk_id=store.id)}}"
+                                   title="Unarchive Store"
+                                   onclick="return confirm('This action will re-activate the selected store.  Continue?')">
+                                    <i class="fa fa-archive"></i>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

@@ -964,6 +964,46 @@ def campaigns_archived():
     )
 
 
+@app.route('/store/<int:store_pk_id>/reactivate', methods=['GET'])
+def store_reactivate(store_pk_id):
+    """
+    Reactivate a store that is archived
+    :param store_pk_id:
+    :return: redirect
+    """
+
+    try:
+        store = db_session.query(Store).filter(
+            Store.id == store_pk_id
+        ).one()
+
+        if store.archived == 1:
+
+            # set the up necessary database flags to reactivate
+            store.archived = 0
+            store.archived_by = None
+            store.archived_date = None
+            store.status = 'ACTIVE'
+
+            # save the changes
+            db_session.commit()
+
+            # flash a message and redirect
+            flash('Store ID: {} {} was successfully reactivated...'.format(store.id, store.name), category='success')
+            return redirect(url_for('store_detail', store_pk_id=store.id))
+
+        else:
+            # store must not be archived, return to the archived store list
+            # and flash a message to the user
+            flash('Error: Store ID: {} can not be reactivated because it is not currently archived.', category='danger')
+            return redirect(url_for('archived_stores'))
+
+    # database error, flash and redirect
+    except exc.SQLAlchemyError as err:
+        flash('Database error occurred: {}'.format(str(err)), category='danger')
+        return redirect(url_for('index'))
+
+
 @app.route('/create/pixel/<int:campaign_pk_id>', methods=['GET'])
 def create_pixel(campaign_pk_id):
     """
