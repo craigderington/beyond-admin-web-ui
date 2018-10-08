@@ -1,0 +1,39 @@
+<?ADF VERSION="1.0"?>
+<adf>
+<prospect>
+<requestdate>{{ today }}</requestdate>
+<vehicle interest="trade-in" status="used">
+<id sequence="1" source="{{ store.name }} {{ campaign.campaign_type }} DMS"></id>
+<year>2016</year>
+<make>Ford</make>
+<model>Edge</model>
+</vehicle>
+<customer>
+<contact>
+<name part="full">John Q. Customer</name>
+<address type="home">
+<street>210 S. Pinellas Ave #195</street>
+<city>Tarpon Springs</city>
+<regioncode>FL</regioncode>
+<postalcode>34689</postalcode>
+</address>
+<email></email>
+<phone>888-942-7117</phone>
+</contact>
+<comments>Estimated Credit: 650 700</comments>
+</customer>
+<vendor>
+<id source="{{ store.name }} DMS">{{ store.name }} {{ campaign.campaign_type }} DMS</id>
+<vendorname></vendorname>
+<contact>
+<name part="full">{{ store.name }}</name>
+</contact>
+</vendor>
+<provider>
+<name part="full">{{ campaign.campaign_type }}</name>
+<service>{{ store.name }} {{ campaign.campaign_type }}</service>
+<url>None</url>
+</provider>
+<leadtype>digital plus</leadtype>
+</prospect>
+</adf>

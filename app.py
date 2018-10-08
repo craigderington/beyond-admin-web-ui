@@ -15,7 +15,6 @@ from forms import AddCampaignForm, UserLoginForm, AddStoreForm, ApproveCampaignF
 import config
 import random
 import datetime
-from datetime import timezone
 import hashlib
 import pymongo
 import phonenumbers
@@ -1420,6 +1419,73 @@ def send_test_creative(campaign_pk_id, **kwargs):
 
     except exc.SQLAlchemyError as err:
         # flash an error message
+        flash('Database returned error: {}'.format(str(err)), category='danger')
+        return redirect(url_for('index'))
+
+
+@app.route('/campaign/<int:campaign_pk_id>/adf/test', methods=['GET'])
+def send_test_adf(campaign_pk_id):
+    """
+    Send test ADF for the selected campaign
+    :param campaign_pk_id:
+    :return: redirect
+    """
+
+    # get our campaign
+
+    try:
+        campaign = db_session.query(Campaign).filter(
+            Campaign.id == campaign_pk_id
+        ).one()
+
+        # do we have a valid campaign?
+        if campaign:
+
+            # get our store variables
+            try:
+                store = db_session.query(Store).filter(
+                    Store.id == campaign.store_id
+                ).one()
+
+                # set the message objects
+                today = datetime.datetime.now().strftime('%c')
+                kwargs = {
+                    'today': today,
+                    'store': store,
+                    'campaign': campaign
+                }
+                subject = str(store.name) + ' ' + str(campaign.campaign_type) + ' DMS'
+                recipients = 'craigderington@python-development-systems.com'   # store.adf_email
+                email_copy = 'rank@contactdms.com'
+                msg_body = render_template('adf_template.xml', **kwargs)
+
+                # create the message object
+                msg = Message(
+                    subject,
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[recipients, ],
+                    cc=[email_copy, ]
+                )
+
+                # assign msg params
+                msg.body = msg_body
+                msg.html = ""
+
+                # send message async, pass to Celery queue
+                send_async_email.delay(msg)
+
+                # flash a message and show result
+                flash('Campaign {} {} test ADF CRM XML email was sent successfully.  '
+                      'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+
+                # redirect back to campaign detail page
+                return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=settings')
+
+            except exc.SQLAlchemyError as err:
+                flash('Database returned error: {}'.format(str(err)), category='danger')
+                return redirect(url_for('index'))
+
+    except exc.SQLAlchemyError as err:
         flash('Database returned error: {}'.format(str(err)), category='danger')
         return redirect(url_for('index'))
 

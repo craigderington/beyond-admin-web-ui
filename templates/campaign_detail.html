@@ -615,8 +615,21 @@
                                     </button>
                                     <input type="hidden" name="store_id" value="{{ store.id }}" />
                                     <input type="hidden" name="campaign_type" value="{{ campaign.type }}" />
-                                    <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default .shiny"><i class="fa fa-times-circle"></i> Cancel</a>
-                                    <a href="{{ url_for('campaign_archive', campaign_pk_id=campaign.id) }}" class="btn btn-lg btn-danger .shiny pull-right"><i class="fa fa-archive"></i> Archive Campaign</a>
+                                    <a href="{{ url_for('campaigns') }}" class="btn btn-lg btn-default shiny"><i class="fa fa-times-circle"></i> Cancel</a>
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-lg btn-default shiny" href="javascript:void(0);"><i class="fa fa-gears"></i> Campaign Options</a>
+                                        <a class="btn btn-lg btn-default dropdown-toggle shiny" data-toggle="dropdown" href="javascript:void(0);"><i class="fa fa-angle-down"></i></a>
+                                        <ul class="dropdown-menu dropdown-default">
+                                            <li>
+                                                <a href="{{ url_for('campaign_archive', campaign_pk_id=campaign.id) }}"><i class="fa fa-archive"></i> Archive Campaign</a>
+                                            </li>
+                                            {% if store.adf_email != 'None' %}
+                                            <li>
+                                                <a href="{{ url_for('send_test_adf', campaign_pk_id=campaign.id) }}"><i class="fa fa-file-code-o"></i> Send TEST ADF XML</a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
                                 </div>
                             </form>
                         </div>
