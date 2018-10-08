@@ -623,7 +623,7 @@
                                             <li>
                                                 <a href="{{ url_for('campaign_archive', campaign_pk_id=campaign.id) }}"><i class="fa fa-archive"></i> Archive Campaign</a>
                                             </li>
-                                            {% if store.adf_email != 'None' %}
+                                            {% if store.adf_email is not None %}
                                             <li>
                                                 <a href="{{ url_for('send_test_adf', campaign_pk_id=campaign.id) }}"><i class="fa fa-file-code-o"></i> Send TEST ADF XML</a>
                                             </li>

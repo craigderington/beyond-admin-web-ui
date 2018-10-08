@@ -1447,38 +1447,44 @@ def send_test_adf(campaign_pk_id):
                     Store.id == campaign.store_id
                 ).one()
 
-                # set the message objects
-                today = datetime.datetime.now().strftime('%c')
-                kwargs = {
-                    'today': today,
-                    'store': store,
-                    'campaign': campaign
-                }
-                subject = str(store.name) + ' ' + str(campaign.campaign_type) + ' DMS'
-                recipients = store.adf_email  # craigderington@python-development-systems.com
-                email_copy = 'rank@contactdms.com'
-                msg_body = render_template('adf_template.xml', **kwargs)
+                if store.adf_email is not None:
 
-                # create the message object
-                msg = Message(
-                    subject,
-                    sender=app.config['MAIL_DEFAULT_SENDER'],
-                    recipients=[recipients, ],
-                    cc=[email_copy, ]
-                )
+                    # set the message objects
+                    today = datetime.datetime.now().strftime('%c')
+                    kwargs = {
+                        'today': today,
+                        'store': store,
+                        'campaign': campaign
+                    }
+                    subject = str(store.name) + ' ' + str(campaign.campaign_type) + ' DMS'
+                    recipients = store.adf_email  # craigderington@python-development-systems.com
+                    email_copy = 'rank@contactdms.com'
+                    msg_body = render_template('adf_template.xml', **kwargs)
 
-                # assign msg params
-                msg.body = msg_body
-                msg.html = ""
+                    # create the message object
+                    msg = Message(
+                        subject,
+                        sender=app.config['MAIL_DEFAULT_SENDER'],
+                        recipients=[recipients, ],
+                        cc=[email_copy, ]
+                    )
 
-                # send message async, pass to Celery queue
-                send_async_email.delay(msg)
+                    # assign msg params
+                    msg.body = msg_body
+                    msg.html = ""
 
-                # flash a message and show result
-                flash('Campaign {} {} test ADF CRM XML email was sent successfully.  '
-                      'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+                    # send message async, pass to Celery queue
+                    send_async_email.delay(msg)
 
-                # redirect back to campaign detail page
+                    # flash a message and show result
+                    flash('Campaign {} {} test ADF CRM XML email was sent successfully.  '
+                          'Test email sent to: {}'.format(campaign.name, campaign.id, recipients), category='success')
+
+                    # redirect back to campaign detail page
+                    return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=settings')
+
+                # store adf email may be empty
+                flash('The ADF email function returned an error: STORE ADF EMAIL NOT FOUND.', category='danger')
                 return redirect(url_for('campaign_detail', campaign_pk_id=campaign_pk_id) + '?=settings')
 
             except exc.SQLAlchemyError as err:
