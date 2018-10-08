@@ -1455,7 +1455,7 @@ def send_test_adf(campaign_pk_id):
                     'campaign': campaign
                 }
                 subject = str(store.name) + ' ' + str(campaign.campaign_type) + ' DMS'
-                recipients = 'craigderington@python-development-systems.com'   # store.adf_email
+                recipients = store.adf_email  # craigderington@python-development-systems.com
                 email_copy = 'rank@contactdms.com'
                 msg_body = render_template('adf_template.xml', **kwargs)
 
