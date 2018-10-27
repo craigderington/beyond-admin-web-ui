@@ -382,6 +382,8 @@ class CampaignDashboard(Base):
     total_rvms = Column(Integer, default=0, nullable=True)
     append_rate = Column(Float, default=0.00, nullable=True)
     last_update = Column(DateTime, onupdate=datetime.now, nullable=True)
+    global_visitors = Column(Integer, default=0, nullable=True)
+    unique_visitors = Column(Integer, default=0, nullable=True)
 
     def __repr__(self):
         return '{} {} {}'.format(
